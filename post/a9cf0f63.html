@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="electron是非常流行的全平台桌面软件开发框架，只是由于国内的网络问题，打包时从github上直接下载会出现无数的坑，此文为踩坑和填坑的记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="electron打包踩坑">
+<meta property="og:url" content="https://mrfengjian.github.io/post/a9cf0f63.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="electron是非常流行的全平台桌面软件开发框架，只是由于国内的网络问题，打包时从github上直接下载会出现无数的坑，此文为踩坑和填坑的记录。">
+<meta property="og:image" content="https://mrfengjian.github.io/post/a9cf0f63/image-20200708145819268.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/a9cf0f63/image-20200708150224170.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/a9cf0f63/image-20200708150518134.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/a9cf0f63/image-20200708150735869.png">
+<meta property="article:published_time" content="2020-07-08T06:35:45.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.653Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="electron">
+<meta property="article:tag" content="操作系统设置">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/a9cf0f63/image-20200708145819268.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>electron打包踩坑 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-electron-build-package-problems" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/a9cf0f63.html" class="article-date">
+      <time datetime="2020-07-08T06:35:45.000Z" itemprop="datePublished">2020-07-08</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      electron打包踩坑
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="electron镜像"><a href="#electron镜像" class="headerlink" title="electron镜像"></a>electron镜像</h1><p>淘宝提供了electron的镜像源，帮助国内用户快速安装，地址为</p>
+<p><code>https://npm.taobao.org/mirrors/electron/</code></p>
+<p>例如，如果全局安装<code>electron</code>，则可使用以下命令</p>
+<p><code>ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/ npm install -g electron</code></p>
+<p>在使用<code>electron-builder</code>打包时，也可以从这个镜像站手动下载放到缓存目录中一遍规避网络问题</p>
+<h2 id="缓存目录"><a href="#缓存目录" class="headerlink" title="缓存目录"></a>缓存目录</h2><p>Windows下路径为：</p>
+<p><code>C:\Users\&lt;用户名&gt;\AppData\Local\electron\Cache</code></p>
+<p>Linux下路径为：</p>
+<p><code>$HOME/.cache/electron/</code></p>
+<p>Mac下路径为：</p>
+<p><code>$HOME/Library/Caches/electron</code></p>
+<h1 id="electron-builder打包"><a href="#electron-builder打包" class="headerlink" title="electron-builder打包"></a>electron-builder打包</h1><p>electron-builder是比较流行的electron打包工具，可以支持全平台、不同架构的包输出。</p>
+<h2 id="各操作系统下的打包命令"><a href="#各操作系统下的打包命令" class="headerlink" title="各操作系统下的打包命令"></a>各操作系统下的打包命令</h2><p>打包win64位安装包</p>
+<p><code>electron-builder --win --x64</code></p>
+<p>打包win32位安装包</p>
+<p><code>electron-builder --win --ia32</code></p>
+<p>打包linux 64位appimage（linux平台下，不指定目标时，默认appimage和snap格式）</p>
+<p><code>electron-builder --linux appimage --x64</code></p>
+<p>打包linux 64位deb和tar.xz包</p>
+<p><code>electron-builder --linux deb tar.xz  --x64</code></p>
+<p>打包树莓派3的appimage包</p>
+<p><code>electron-builder --linux appimage --armv7l</code></p>
+<p>打包树莓派4 64位的appimage包</p>
+<p><code>electron-builder --linux appimage --arm64</code></p>
+<blockquote>
+<p>关于交叉编译：</p>
+<p>由于node_modules的编译安装问题，windows平台下，如果交叉编译linux的软件包，必须使用<code>wsl</code>做隔离，在编译时，必须清理windows下的安装，重新install</p>
+<p>在linux下交叉编译windows软件包，需要依赖wine设置，可以从淘宝镜像源上下载准备好</p>
+</blockquote>
+<h2 id="加速构建"><a href="#加速构建" class="headerlink" title="加速构建"></a>加速构建</h2><p>淘宝提供了electron-builder的镜像源，帮助国内用户快速安装，地址为</p>
+<p><code>https://npm.taobao.org/mirrors/electron-builder-binaries/</code></p>
+<p>但此镜像源也不是完整的镜像，部分软件包没有同步，只能从github上下载，解决部分软件的问题。</p>
+<p>以windows系统为例，说明在linux和windows上的主要软件包处理方式</p>
+<h3 id="electron"><a href="#electron" class="headerlink" title="electron"></a>electron</h3><p>将electron-builder日志中，缺失的electron操作系统包从淘宝镜像源上下载，以<code>electron-v2.0.18-win32-x64.zip</code>为例，淘宝镜像源对应版本的<a href="https://npm.taobao.org/mirrors/electron/2.0.18/electron-v2.0.18-win32-x64.zip" target="_blank" rel="noopener">https://npm.taobao.org/mirrors/electron/2.0.18/electron-v2.0.18-win32-x64.zip</a> ，下载后，放到<strong>electron的缓存目录中</strong>，如下图所示：</p>
+<p><img src="/post/a9cf0f63/image-20200708145819268.png" alt="image-20200708145819268"></p>
+<h3 id="winCodeSign"><a href="#winCodeSign" class="headerlink" title="winCodeSign"></a>winCodeSign</h3><p>windows平台下，打包还需要的winCodeSign-2.4.0，可以从淘宝镜像源对应版本地址<a href="https://npm.taobao.org/mirrors/electron-builder-binaries/winCodeSign-2.4.0/winCodeSign-2.4.0.7z，并将文件解压到**electron-builder缓存目录**的`winCodeSign\winCodeSign-2.4.0`子目录下，子目录名字与软件包名字必须保持一致，如下图所示：" target="_blank" rel="noopener">https://npm.taobao.org/mirrors/electron-builder-binaries/winCodeSign-2.4.0/winCodeSign-2.4.0.7z，并将文件解压到**electron-builder缓存目录**的`winCodeSign\winCodeSign-2.4.0`子目录下，子目录名字与软件包名字必须保持一致，如下图所示：</a></p>
+<p><img src="/post/a9cf0f63/image-20200708150224170.png" alt="image-20200708150224170"></p>
+<h3 id="nsis"><a href="#nsis" class="headerlink" title="nsis"></a>nsis</h3><p>缺失软件包nsis-3.0.3.2时，可以从淘宝镜像源对应版本地址<a href="https://npm.taobao.org/mirrors/electron-builder-binaries/nsis-3.0.3.2/nsis-3.0.3.2.7z下载，并解压到**electron-builder缓存目录**的对应子目录`nsis\nsis-3.0.3.2`下，软件包名字与子目录名字保持一致。" target="_blank" rel="noopener">https://npm.taobao.org/mirrors/electron-builder-binaries/nsis-3.0.3.2/nsis-3.0.3.2.7z下载，并解压到**electron-builder缓存目录**的对应子目录`nsis\nsis-3.0.3.2`下，软件包名字与子目录名字保持一致。</a></p>
+<p><img src="/post/a9cf0f63/image-20200708150518134.png" alt="image-20200708150518134"></p>
+<h3 id="nsis-resource"><a href="#nsis-resource" class="headerlink" title="nsis-resource"></a>nsis-resource</h3><p>软件包nsis-resources-3.3.0在淘宝镜像源上并没有同步，只能从官方github仓库上下载，可以通过腾讯云或者阿里云等VPC上下载后，传回本地安装，存放到<strong>electron-builder缓存目录</strong>的对应子目录<code>nsis\nsis-resources-3.3.0</code>下</p>
+<p><img src="/post/a9cf0f63/image-20200708150735869.png" alt="image-20200708150735869"></p>
+<h3 id="chrome-driver"><a href="#chrome-driver" class="headerlink" title="chrome-driver"></a>chrome-driver</h3><p>有些情况下，通过<code>yarn</code>安装依赖时，下载安装chromedriver会因为超时失败，这时，可以使用淘宝镜像源加入构建，目前仅能使用<code>npm</code>或者<code>cnpm</code>命令行使用淘宝镜像源</p>
+<p><code>npm install chromedriver --chromedriver_cdnurl=http://npm.taobao.org/mirrors/chromedriver</code></p>
+<h2 id="linux下打包"><a href="#linux下打包" class="headerlink" title="linux下打包"></a>linux下打包</h2><ul>
+<li><p>打包deb包时，需要使用ar命令，在<code>binutils</code>软件包中，可使用下列命令安装：</p>
+<p><code>sudo apt-get install binutils</code></p>
+</li>
+<li><p>打包snap包时，需要安装并启动<code>snapd</code>服务，在<code>wsl</code>和<code>wsl2</code>下都无法使用，只能在Linux平台下编译</p>
+</li>
+</ul>
+<h2 id="缓存目录-1"><a href="#缓存目录-1" class="headerlink" title="缓存目录"></a>缓存目录</h2><p>Windows下路径为：</p>
+<p><code>C:\Users\&lt;用户名&gt;\AppData\Local\electron-builder\Cache</code></p>
+<p>Linux下路径为：</p>
+<p><code>$HOME/.cache/electron-builder/</code></p>
+<p>Mac下路径为：</p>
+<p><code>$HOME/Library/Caches/electron-builder</code></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/a9cf0f63.html">electron打包踩坑</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2020-07-08, 14:35:45</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/a9cf0f63.html" title="electron打包踩坑">https://mrfengjian.github.io/post/a9cf0f63.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/a9cf0f63.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/b6ae07.html">
+                    在electron中实现PDF预览功能
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/3c644b30.html">
+                    vue与beego的集成
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#electron镜像"><span class="toc-number">1.</span> <span class="toc-text">electron镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存目录"><span class="toc-number">1.1.</span> <span class="toc-text">缓存目录</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#electron-builder打包"><span class="toc-number">2.</span> <span class="toc-text">electron-builder打包</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#各操作系统下的打包命令"><span class="toc-number">2.1.</span> <span class="toc-text">各操作系统下的打包命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加速构建"><span class="toc-number">2.2.</span> <span class="toc-text">加速构建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#electron"><span class="toc-number">2.2.1.</span> <span class="toc-text">electron</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#winCodeSign"><span class="toc-number">2.2.2.</span> <span class="toc-text">winCodeSign</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nsis"><span class="toc-number">2.2.3.</span> <span class="toc-text">nsis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nsis-resource"><span class="toc-number">2.2.4.</span> <span class="toc-text">nsis-resource</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chrome-driver"><span class="toc-number">2.2.5.</span> <span class="toc-text">chrome-driver</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#linux下打包"><span class="toc-number">2.3.</span> <span class="toc-text">linux下打包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存目录-1"><span class="toc-number">2.4.</span> <span class="toc-text">缓存目录</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"electron打包踩坑　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/b6ae07.html" title="上一篇: 在electron中实现PDF预览功能">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/3c644b30.html" title="下一篇: vue与beego的集成">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

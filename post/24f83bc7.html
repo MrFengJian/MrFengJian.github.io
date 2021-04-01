@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="基于kafka多节点共识的fabric环境手动搭建过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步搭建kafka共识的fabric环境">
+<meta property="og:url" content="https://mrfengjian.github.io/post/24f83bc7.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="基于kafka多节点共识的fabric环境手动搭建过程">
+<meta property="og:image" content="https://mrfengjian.github.io/post/24f83bc7/1525318769266.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/24f83bc7/1525252897594.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/24f83bc7/1525252990170.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/24f83bc7/1525253046134.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/24f83bc7/1525253081809.png">
+<meta property="article:published_time" content="2018-12-20T07:30:16.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.636Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="fabric">
+<meta property="article:tag" content="kafka共识">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/24f83bc7/1525318769266.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>一步一步搭建kafka共识的fabric环境 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-build_fabric_network_with_kafka_orders" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/24f83bc7.html" class="article-date">
+      <time datetime="2018-12-20T07:30:16.000Z" itemprop="datePublished">2018-12-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      一步一步搭建kafka共识的fabric环境
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>在上一篇<a href="./build_fabric_network_step_by_step.md">一步一步搭建hyperledger环境</a>中，介绍了一步一步使用修改过的社区e2e例子，来搭建fabric多组织多通道的环境，其中的orderer采用solo单节点共识模式，在实际环境中，都应当采用基于kafka的分布式共识模式，提高程序的可靠性和安全性。下面介绍下搭建基于kafka的orderer集群部署的fabric network。</p>
+<h1 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1 环境准备"></a>1 环境准备</h1><p>参考<a href="./build_fabric_network_step_by_step.md">一步一步搭建hyperledger环境</a>中的环境准备，安装好docker、make等程序，准备好部署</p>
+<h1 id="2-生成公私钥和证书"><a href="#2-生成公私钥和证书" class="headerlink" title="2 生成公私钥和证书"></a>2 生成公私钥和证书</h1><h2 id="2-1-修改crypt-config"><a href="#2-1-修改crypt-config" class="headerlink" title="2.1 修改crypt-config"></a>2.1 修改crypt-config</h2><p>编译<code>cryptogen</code>后，即可生成orderer集群的配置，修改orderer部分的配置如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">OrdererOrgs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">Name:</span> <span class="string">Orderer</span></span><br><span class="line">    <span class="attr">Domain:</span> <span class="string">example.com</span></span><br><span class="line">    <span class="comment">#组织内只有一个节点时，通过Specs指定</span></span><br><span class="line">    <span class="attr">Specs:</span></span><br><span class="line">      <span class="comment">#指定orderer集群各节点主机名</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">Hostname:</span> <span class="string">orderer0</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">Hostname:</span> <span class="string">orderer1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">Hostname:</span> <span class="string">orderer2</span></span><br><span class="line"><span class="attr">PeerOrgs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">Name:</span> <span class="string">Org1</span></span><br><span class="line">    <span class="attr">Domain:</span> <span class="string">org1.example.com</span></span><br><span class="line">    <span class="comment">#组织内由一个或者多个节点时，通过template指定</span></span><br><span class="line">    <span class="attr">Template:</span></span><br><span class="line">      <span class="comment">#节点个数，生成的主机名按顺序peer0到peer&#123;Count-1&#125;</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">Users:</span></span><br><span class="line">      <span class="comment">#生成的除Admin之外的普通用户证书个数</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">1</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">Name:</span> <span class="string">Org2</span></span><br><span class="line">    <span class="attr">Domain:</span> <span class="string">org2.example.com</span></span><br><span class="line">    <span class="attr">Template:</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">Users:</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">1</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">Name:</span> <span class="string">Org3</span></span><br><span class="line">    <span class="attr">Domain:</span> <span class="string">org3.example.com</span></span><br><span class="line">    <span class="attr">Template:</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">Users:</span></span><br><span class="line">      <span class="attr">Count:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-生成公私钥和证书"><a href="#2-2-生成公私钥和证书" class="headerlink" title="2.2 生成公私钥和证书"></a>2.2 生成公私钥和证书</h2><blockquote>
+<p>注意：为避免每次命令输入过长路径，将build/bin追加到<code>PATH</code>环境变量路径中。</p>
+<p><code>export PATH=$PATH:../../build/bin</code></p>
+</blockquote>
+<p>执行下列命令，使用<code>crypto-config.yaml</code>配置生成orderer集群环境中的所有公私钥和证书。</p>
+<p><code>cryptogen generate --config=./crypto-config.yaml</code></p>
+<p>可使用<code>tree cryptogen-config -d</code>命令来检查目录，正常生成了各个orderer节点的证书配置，如下图所示：</p>
+<p><img src="/post/24f83bc7/1525318769266.png" alt="1525318769266"></p>
+<h1 id="3-生成创世块和channel配置"><a href="#3-生成创世块和channel配置" class="headerlink" title="3 生成创世块和channel配置"></a>3 生成创世块和channel配置</h1><h2 id="3-1-配置confitx-yaml"><a href="#3-1-配置confitx-yaml" class="headerlink" title="3.1 配置confitx.yaml"></a>3.1 配置confitx.yaml</h2><p>参考orderer集群配置，修改configtx.yaml中的orderer配置，将其修改为kafka共识模式，修改后的configtx.yaml内容如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">Profiles:</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">ThreeOrgsOrdererGenesis:</span></span><br><span class="line">        <span class="attr">Orderer:</span></span><br><span class="line">            <span class="string">&lt;&lt;:</span> <span class="meta">*OrdererDefaults</span></span><br><span class="line">            <span class="attr">Organizations:</span></span><br><span class="line">                <span class="bullet">-</span> <span class="meta">*OrdererOrg</span></span><br><span class="line">        <span class="comment">#每个consortium都是一组成员的集合</span></span><br><span class="line">        <span class="attr">Consortiums:</span></span><br><span class="line">            <span class="attr">Consortium1:</span></span><br><span class="line">                <span class="attr">Organizations:</span></span><br><span class="line">                    <span class="bullet">-</span> <span class="meta">*Org1</span></span><br><span class="line">            <span class="attr">Consortium2:</span></span><br><span class="line">                <span class="attr">Organizations:</span></span><br><span class="line">                    <span class="bullet">-</span> <span class="meta">*Org2</span></span><br><span class="line">            <span class="attr">Consortium3:</span></span><br><span class="line">                <span class="attr">Organizations:</span></span><br><span class="line">                    <span class="bullet">-</span> <span class="meta">*Org3</span></span><br><span class="line">        </span><br><span class="line">    <span class="attr">Orgs1Channel:</span></span><br><span class="line">        <span class="attr">Consortium:</span> <span class="string">Consortium1</span></span><br><span class="line">        <span class="attr">Application:</span></span><br><span class="line">            <span class="string">&lt;&lt;:</span> <span class="meta">*ApplicationDefaults</span></span><br><span class="line">            <span class="attr">Organizations:</span></span><br><span class="line">                <span class="bullet">-</span> <span class="meta">*Org1</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Orgs2Channel:</span></span><br><span class="line">        <span class="attr">Consortium:</span> <span class="string">Consortium2</span></span><br><span class="line">        <span class="attr">Application:</span></span><br><span class="line">            <span class="string">&lt;&lt;:</span> <span class="meta">*ApplicationDefaults</span></span><br><span class="line">            <span class="attr">Organizations:</span></span><br><span class="line">                <span class="bullet">-</span> <span class="meta">*Org2</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Orgs3Channel:</span></span><br><span class="line">        <span class="attr">Consortium:</span> <span class="string">Consortium3</span></span><br><span class="line">        <span class="attr">Application:</span></span><br><span class="line">            <span class="string">&lt;&lt;:</span> <span class="meta">*ApplicationDefaults</span></span><br><span class="line">            <span class="attr">Organizations:</span></span><br><span class="line">                <span class="bullet">-</span> <span class="meta">*Org3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#order组织和peer组织的配置</span></span><br><span class="line"><span class="attr">Organizations:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># order组织的配置</span></span><br><span class="line">    <span class="bullet">-</span> <span class="meta">&amp;OrdererOrg</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">Name:</span> <span class="string">OrdererOrg</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">ID:</span> <span class="string">OrdererMSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">MSPDir:</span> <span class="string">crypto-config/ordererOrganizations/example.com/msp</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="meta">&amp;Org1</span></span><br><span class="line">    </span><br><span class="line">        <span class="attr">Name:</span> <span class="string">Org1MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">ID:</span> <span class="string">Org1MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">MSPDir:</span> <span class="string">crypto-config/peerOrganizations/org1.example.com/msp</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">AnchorPeers:</span></span><br><span class="line"></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">Host:</span> <span class="string">peer0.org1.example.com</span></span><br><span class="line">              <span class="attr">Port:</span> <span class="number">7051</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="meta">&amp;Org2</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">Name:</span> <span class="string">Org2MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">ID:</span> <span class="string">Org2MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">MSPDir:</span> <span class="string">crypto-config/peerOrganizations/org2.example.com/msp</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">AnchorPeers:</span></span><br><span class="line"></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">Host:</span> <span class="string">peer0.org2.example.com</span></span><br><span class="line">              <span class="attr">Port:</span> <span class="number">7051</span></span><br><span class="line">    <span class="bullet">-</span> <span class="meta">&amp;Org3</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">Name:</span> <span class="string">Org3MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">ID:</span> <span class="string">Org3MSP</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">MSPDir:</span> <span class="string">crypto-config/peerOrganizations/org3.example.com/msp</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">AnchorPeers:</span></span><br><span class="line"></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">Host:</span> <span class="string">peer0.org3.example.com</span></span><br><span class="line">              <span class="attr">Port:</span> <span class="number">7051</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#orderer的配置</span></span><br><span class="line"><span class="attr">Orderer:</span> <span class="meta">&amp;OrdererDefaults</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># orderer共识模式，支持solo和kafka两种</span></span><br><span class="line">    <span class="attr">OrdererType:</span> <span class="string">kafka</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># orderer集群服务地址</span></span><br><span class="line">    <span class="attr">Addresses:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">orderer0.example.com:7050</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">orderer1.example.com:7050</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">orderer2.example.com:7050</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 批次提交的间隔描述</span></span><br><span class="line">    <span class="attr">BatchTimeout:</span> <span class="string">2s</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 控制多少个消息产生一个区块</span></span><br><span class="line">    <span class="attr">BatchSize:</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Max Message Count: The maximum number of messages to permit in a batch</span></span><br><span class="line">        <span class="attr">MaxMessageCount:</span> <span class="number">10</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 设置最大的区块大小。每个区块最大有Orderer.AbsoluteMaxBytes个字节（不包括头部）</span></span><br><span class="line">        <span class="comment"># 这个值的大小需要与kafka代理的配置保持一致</span></span><br><span class="line">        <span class="attr">AbsoluteMaxBytes:</span> <span class="number">99</span> <span class="string">MB</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 设置每个区块建议的大小。Kafka对于相对小的消息提供更高的吞吐量；区块大小最好不要超过1MB</span></span><br><span class="line">        <span class="attr">PreferredMaxBytes:</span> <span class="number">512</span> <span class="string">KB</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Kafka:</span></span><br><span class="line">        <span class="comment"># kafka的代理地址，不需要是所有的代理地址，但最少要有两个</span></span><br><span class="line">        <span class="comment"># 所有orderer节点使用此代理地址连接</span></span><br><span class="line">        <span class="attr">Brokers:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">kafka1:9092</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">kafka2:9092</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">kafka3:9092</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">kafka4:9092</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Organizations:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Application:</span> <span class="meta">&amp;ApplicationDefaults</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Organizations:</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>kafka需要最少4个节点才能组成一个容错的集群，如果一个代理崩溃了，channel还可以继续读写，也可以继续创建新的channel，否则会工作异常。</p>
+</blockquote>
+<h2 id="3-2-生成系统配置"><a href="#3-2-生成系统配置" class="headerlink" title="3.2 生成系统配置"></a>3.2 生成系统配置</h2><p>1）使用如下命令，生成创世块</p>
+<p><code>configtxgen -profile ThreeOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block</code></p>
+<p>产生如下输出，表示创世块生成成功</p>
+<p><img src="/post/24f83bc7/1525252897594.png" alt="1525252897594"></p>
+<p>2）使用下面的命令，生成各个通道的交易配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">configtxgen -profile Orgs1Channel -outputCreateChannelTx ./channel-artifacts/channel1.tx -channelID channel1</span><br><span class="line">configtxgen -profile Orgs2Channel -outputCreateChannelTx ./channel-artifacts/channel2.tx -channelID channel2</span><br><span class="line">configtxgen -profile Orgs3Channel -outputCreateChannelTx ./channel-artifacts/channel3.tx -channelID channel3</span><br></pre></td></tr></table></figure>
+
+<p>产生如下输出，表示创建成功。</p>
+<p><img src="/post/24f83bc7/1525252990170.png" alt="1525252990170"></p>
+<p>3）使用下面的命令，生成各组织的锚节点交易配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">configtxgen -profile Orgs1Channel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID channel1 -asOrg Org1MSP</span><br><span class="line">configtxgen -profile Orgs2Channel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID channel2 -asOrg Org2MSP</span><br><span class="line">configtxgen -profile Orgs3Channel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID channel3 -asOrg Org3MSP</span><br></pre></td></tr></table></figure>
+
+<p><img src="/post/24f83bc7/1525253046134.png" alt="1525253046134"></p>
+<p>最终产生下面7个系统配置文件文件</p>
+<p><img src="/post/24f83bc7/1525253081809.png" alt="1525253081809"></p>
+<h1 id="4-编写fabric网络docker-compose文件"><a href="#4-编写fabric网络docker-compose文件" class="headerlink" title="4 编写fabric网络docker-compose文件"></a>4 编写fabric网络docker-compose文件</h1><h2 id="4-1-zookeeper集群配置yaml"><a href="#4-1-zookeeper集群配置yaml" class="headerlink" title="4.1 zookeeper集群配置yaml"></a>4.1 zookeeper集群配置yaml</h2><p>zookeeper的节点个数需要为奇数，根据节点能力使用3或5或7，超过7个可能会造成不必要的资源浪费。</p>
+<p>以其中一个的yaml配置为例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">zookeeper0.example.com:</span><br><span class="line">    container_name: zookeeper0.example.com</span><br><span class="line">    image: hyperledger&#x2F;fabric-zookeeper</span><br><span class="line">    environment:</span><br><span class="line">      #zookeeper服务器列表，server.1表示ID为1的节点信息</span><br><span class="line">      #2888端口是follower连接leader使用，3888端口用户节点间选举leader</span><br><span class="line">      - ZOO_SERVERS&#x3D;server.1&#x3D;zookeeper0.example.com:2888:3888 server.2&#x3D;zookeeper1.example.com:2888:3888 server.3&#x3D;zookeeper2.example.com:2888:3888</span><br><span class="line">      #当前节点的ID，不允许重复，范围在1-255之间。</span><br><span class="line">      #保持与ZOO_SERVERS中顺序一致</span><br><span class="line">      - ZOO_MY_ID&#x3D;1</span><br><span class="line">    expose:</span><br><span class="line">      - 2181</span><br><span class="line">      - 2888</span><br><span class="line">      - 3888</span><br></pre></td></tr></table></figure>
+
+<p>其他几个zookeeper节点的配置类似，只是<code>ZOO_MY_ID依次</code>为2、3，且不重复即可。</p>
+<p>##4.2 kafka集群配置yaml</p>
+<p>若要保证容错性，kafka集群最少需要4台服务器来保证，此时允许1个代理出现问题。</p>
+<p>kafka0的yaml配置如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kafka0.example.com:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">kafka0.example.com</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-kafka</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="comment">#kafka代理ID，保持不重复的整数即可</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_BROKER_ID=0</span></span><br><span class="line">      <span class="comment"># 在configtx.yaml中会设置最大的区块大小（参考configtx.yaml中AbsoluteMaxBytes参数）。</span></span><br><span class="line">      <span class="comment"># 每个区块最大有Orderer.AbsoluteMaxBytes个字节（不包括头部），假定这里设置的值为A（目前99）。</span></span><br><span class="line">      <span class="comment"># message.max.bytes和replica.fetch.max.bytes应该设置一个大于A。</span></span><br><span class="line">      <span class="comment"># 为header增加一些缓冲区空间---1MB已经足够大。上述不同设置值之间满足如下关系：</span></span><br><span class="line">      <span class="comment"># Orderer.AbsoluteMaxBytes &lt; replica.fetch.max.bytes &lt;= message.max.bytes</span></span><br><span class="line">      <span class="comment"># （更完整的是，message.max.bytes应该严格小于socket.request.max.bytes的值，socket.request.max.bytes的值默认被设置为100MB。</span></span><br><span class="line">      <span class="comment"># 如果想要区块的大小大于100MB，需要编辑fabric/orderer/kafka/config.go文件里硬编码的值brokerConfig.Producer.MaxMessageBytes，</span></span><br><span class="line">      <span class="comment"># 修改后重新编译源码得到二进制文件，这种设置是不建议的。）</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_MESSAGE_MAX_BYTES=103809024</span></span><br><span class="line">      <span class="comment"># 试图为每个通道获取的消息的字节数。</span></span><br><span class="line">      <span class="comment"># 这不是绝对最大值，如果获取的信息大于这个值，则仍然会返回信息，以确保可以取得进展。</span></span><br><span class="line">      <span class="comment"># 代理所接受的最大消息大小是通过上一条message.max.bytes定义的。</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_REPLICA_FETCH_MAX_BYTES=103809024</span></span><br><span class="line">      <span class="comment"># 数据一致性在区块链环境中是至关重要的。</span></span><br><span class="line">      <span class="comment"># 我们不能从in-sync 副本（ISR）集合之外选取channel leader，</span></span><br><span class="line">      <span class="comment"># 否则我们将会面临对于之前的leader产生的offsets覆盖的风险，</span></span><br><span class="line">      <span class="comment"># 这样的结果是，orderers产生的区块可能会重新写入区块链。</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false</span></span><br><span class="line">      <span class="comment"># min.insync.replicas = M---设置一个M值（例如1&lt;M&lt;N，查看下面的default.replication.factor）</span></span><br><span class="line">      <span class="comment"># 数据提交时会写入至少M个副本（这些数据然后会被同步并且归属到in-sync 副本集合或ISR）。</span></span><br><span class="line">      <span class="comment"># 其它情况，写入操作会返回一个错误。接下来：</span></span><br><span class="line">      <span class="comment"># 1）如果channel写入的数据多达N-M个副本变的不可用，操作可以正常执行。</span></span><br><span class="line">      <span class="comment"># 2）如果有更多的副本不可用，Kafka不可以维护一个有M数量的ISR集合，因此Kafka停止接收写操作。Channel只有当同步M个副本后才可以重新可以写。</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_MIN_INSYNC_REPLICAS=2</span></span><br><span class="line">      <span class="comment"># 设置一个值N，N&lt;K。</span></span><br><span class="line">      <span class="comment"># 设置replication factor参数为N代表着每个channel都保存N个副本的数据到Kafka的代理上。</span></span><br><span class="line">      <span class="comment"># 这些都是一个channel的ISR集合的候选。</span></span><br><span class="line">      <span class="comment"># 如同在上边min.insync.replicas section设置部分所描述的，不是所有的代理（orderer）在任何时候都是可用的。</span></span><br><span class="line">      <span class="comment"># N的值必须小于K，如果少于N个代理的话，channel的创建是不能成功的。</span></span><br><span class="line">      <span class="comment"># 因此，如果设置N的值为K，一个代理失效后，那么区块链网络将不能再创建新的channel---orderering service的crash容错也就不存在了。</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_DEFAULT_REPLICATION_FACTOR=3</span></span><br><span class="line">      <span class="comment">#zookeeper节点集合</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KAFKA_ZOOKEEPER_CONNECT=zookeeper0.example.com:2181,zookeeper1.example.com:2181,zookeeper2.example.com:2181</span></span><br><span class="line">    <span class="attr">expose:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">9092</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">9093</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-orderer配置修改"><a href="#4-3-orderer配置修改" class="headerlink" title="4.3 orderer配置修改"></a>4.3 orderer配置修改</h2><p>相对与solo模式，orderer节点的环境变量配置稍有变动，其中一个order的配置如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">orderer0.example.com:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">orderer0.example.com</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-orderer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOGLEVEL=debug</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LISTENADDRESS=0.0.0.0</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_GENESISMETHOD=file</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOCALMSPID=OrdererMSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp</span></span><br><span class="line">      <span class="comment"># enabled TLS</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]</span></span><br><span class="line">      <span class="comment"># 增加kafka相关配置</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_KAFKA_RETRY_SHORTTOTAL=30s</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_KAFKA_RETRY_LONGINTERVAL=10s</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_KAFKA_RETRY_LONGTOTAL=100s</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_KAFKA_VERBOSE=true</span></span><br><span class="line">    <span class="attr">working_dir:</span> <span class="string">/opt/gopath/src/github.com/hyperledger/fabric</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">orderer</span></span><br><span class="line">    <span class="comment">#注意载卷的路径</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">../crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/msp:/var/hyperledger/orderer/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">../crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/:/var/hyperledger/orderer/tls</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">7050</span><span class="string">:7050</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在前面的configtx.yaml配置中，已经增加了orderer集群连接的kafka集群地址，orderer在启动时，可以直接从创世块中读取使用。</p>
+</blockquote>
+<h1 id="5-启动orderer集群的fabric环境"><a href="#5-启动orderer集群的fabric环境" class="headerlink" title="5 启动orderer集群的fabric环境"></a>5 启动orderer集群的fabric环境</h1><blockquote>
+<p>注意：启动前，手动拉取下列相关镜像的1.0.0版本，并更名为latest版本。</p>
+<ul>
+<li>hyperledger/fabric-tools:x86_64-1.0.0</li>
+<li>hyperledger/fabric-orderer:x86_64-1.0.0</li>
+<li>hyperledger/fabric-peer:x86_64-1.0.0</li>
+<li>hyperledger/fabric-zookeeper:x86_64-1.0.0</li>
+<li>hyperledger/fabric-kafka:x86_64-1.0.0</li>
+</ul>
+</blockquote>
+<p>使用命令<code>docker-comose -f docker-compose-kafka.yaml up -d</code>启动测试环境。</p>
+<p>在容器<code>cli</code>中依次执行下列命令，测试channel创建、peer加入channel、chaincode的安装和交易测试。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">peer channel create -o orderer0.example.com:7050 -c channel1 -f ./channel-artifacts/channel1.tx --tls <span class="literal">true</span> --cafile <span class="variable">$ORDERER_CA</span></span><br><span class="line"></span><br><span class="line">peer channel join -b channel1.block</span><br><span class="line"></span><br><span class="line">peer channel update -o orderer0.example.com:7050 -c channel1 -f ./channel-artifacts/Org1MSPanchors.tx --tls <span class="literal">true</span> --cafile <span class="variable">$ORDERER_CA</span></span><br><span class="line"></span><br><span class="line">peer chaincode install -n mycc -v 1.0 -p github.com/chaincode/chaincode_example02/go/</span><br><span class="line"></span><br><span class="line">peer chaincode instantiate -o orderer0.example.com:7050 --tls <span class="literal">true</span> --cafile <span class="variable">$ORDERER_CA</span> -C channel1 -n mycc -v 1.0 -c <span class="string">'&#123;"Args":["init","a","100","b","200"]&#125;'</span></span><br><span class="line"></span><br><span class="line">peer chaincode query -C channel1 -n mycc -c <span class="string">'&#123;"Args":["query","a"]&#125;'</span></span><br><span class="line"></span><br><span class="line">peer chaincode invoke -o orderer0.example.com:7050  --tls <span class="literal">true</span> --cafile <span class="variable">$ORDERER_CA</span> -C channel1 -n mycc -c <span class="string">'&#123;"Args":["invoke","b","a","1"]&#125;'</span></span><br><span class="line"></span><br><span class="line">peer chaincode query -C channel1 -n mycc -c <span class="string">'&#123;"Args":["query","a"]&#125;'</span></span><br></pre></td></tr></table></figure>
+
+<p>更多的测试细节可参考<a href="./build_fabric_network_step_by_step.md">一步一步搭建hyperledger环境</a>中的测试章节来进行验证。</p>
+<h1 id="6-总结"><a href="#6-总结" class="headerlink" title="6 总结"></a>6 总结</h1><p>至此，我们完成了kafka共识的orderer集群的搭建，并测试了基本的区块链业务功能。在实际生产环境中，更多的是对orderer、kafka、zookeeper参数的调校，达到符合环境的最佳性能要求。如果需要增加orderer、kafka、zookeeper等更多节点来提高可靠性，可参考文档示例增加相应配置即可。</p>
+<p>所有的yaml和配置参考<a href="https://github.com/swordboy/fabric_examples/tree/master/kafka" target="_blank" rel="noopener">链接</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2018-12-20, 15:30:16</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/24f83bc7.html" title="一步一步搭建kafka共识的fabric环境">https://mrfengjian.github.io/post/24f83bc7.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/24f83bc7.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/6cc685c6.html">
+                    智能合约开发指南
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/15ebafa6.html">
+                    fabric-ca生成所有证书搭建fabric环境
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-环境准备"><span class="toc-number">1.</span> <span class="toc-text">1 环境准备</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-生成公私钥和证书"><span class="toc-number">2.</span> <span class="toc-text">2 生成公私钥和证书</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-修改crypt-config"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 修改crypt-config</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-生成公私钥和证书"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 生成公私钥和证书</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-生成创世块和channel配置"><span class="toc-number">3.</span> <span class="toc-text">3 生成创世块和channel配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-配置confitx-yaml"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 配置confitx.yaml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-生成系统配置"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 生成系统配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-编写fabric网络docker-compose文件"><span class="toc-number">4.</span> <span class="toc-text">4 编写fabric网络docker-compose文件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-zookeeper集群配置yaml"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 zookeeper集群配置yaml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-orderer配置修改"><span class="toc-number">4.2.</span> <span class="toc-text">4.3 orderer配置修改</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-启动orderer集群的fabric环境"><span class="toc-number">5.</span> <span class="toc-text">5 启动orderer集群的fabric环境</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-总结"><span class="toc-number">6.</span> <span class="toc-text">6 总结</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"一步一步搭建kafka共识的fabric环境　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/6cc685c6.html" title="上一篇: 智能合约开发指南">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/15ebafa6.html" title="下一篇: fabric-ca生成所有证书搭建fabric环境">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

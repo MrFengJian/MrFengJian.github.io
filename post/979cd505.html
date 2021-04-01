@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="ansible基本知识整理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ansible入门（一）">
+<meta property="og:url" content="https://mrfengjian.github.io/post/979cd505.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="ansible基本知识整理">
+<meta property="article:published_time" content="2020-03-02T03:35:43.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.580Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="ansible">
+<meta property="article:tag" content="分布式环境部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>ansible入门（一） | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-ansible-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/979cd505.html" class="article-date">
+      <time datetime="2020-03-02T03:35:43.000Z" itemprop="datePublished">2020-03-02</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ansible入门（一）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>可以参考官方文档，直接使用pip进行安装。</p>
+<h2 id="管理机要求"><a href="#管理机要求" class="headerlink" title="管理机要求"></a>管理机要求</h2><h2 id="托管节点要求"><a href="#托管节点要求" class="headerlink" title="托管节点要求"></a>托管节点要求</h2><ol>
+<li>最好配置使用ssh密钥方式登录，需要提前配置</li>
+</ol>
+<h1 id="第一条命令"><a href="#第一条命令" class="headerlink" title="第一条命令"></a>第一条命令</h1><p>默认使用/etc/ansible/hosts中的主机作为操作对象，示例命令<br><code>ansible all -m setup</code><br>可以获取所有主机的配置信息。</p>
+<blockquote>
+<p>如果一个主机同时在多个分组出现，ansible会自动进行去重</p>
+</blockquote>
+<h1 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h1><p>执行任务的单元，可以使用python、shell脚本或者其他语言进行实现。<br>可使用<code>ansible-doc -s setup</code>查询模块帮助文档</p>
+<h2 id="常用模块"><a href="#常用模块" class="headerlink" title="常用模块"></a>常用模块</h2><p>所有模块参见<a href="https://docs.ansible.com/ansible/latest/modules/modules_by_category.html" target="_blank" rel="noopener">Module Index — Ansible Documentation</a></p>
+<h3 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h3><p>用于检测主机是否可达。命令示例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m ping</span></span><br><span class="line">ubuntu1 | SUCCESS =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": false, </span><br><span class="line">    "ping": "pong"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="setup"><a href="#setup" class="headerlink" title="setup"></a>setup</h3><p>用于检测托管机器的配置，可以获取CPU、内存、网卡、虚拟化等若干配置，可以使用filter参数过滤单项输出或者使用gather_subnet过滤指定集合输出。命令示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m setup -a <span class="string">'filter=ansible_nodename'</span></span></span><br><span class="line">ubuntu1 | SUCCESS =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "ansible_nodename": "ubuntu1", </span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="command"><a href="#command" class="headerlink" title="command"></a>command</h3><p>默认模块，用于在托管机器上执行一条指令。<strong>不支持管道符和&amp;&amp;符号</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">creates：一个文件名，当该文件存在，则该命令不执行</span><br><span class="line"></span><br><span class="line">free_form：要执行的linux指令</span><br><span class="line"></span><br><span class="line">chdir：在执行指令之前，先切换到该目录</span><br><span class="line"></span><br><span class="line">removes：一个文件名，当该文件不存在，则该选项不执行</span><br><span class="line"></span><br><span class="line">executable：切换shell来执行指令，该执行路径必须是一个绝对路径</span><br></pre></td></tr></table></figure>
+<p>示例命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ansible all -m command -a &#39;date&#39;</span><br><span class="line">ubuntu1 | CHANGED | rc&#x3D;0 &gt;&gt;</span><br><span class="line">Sat Oct 12 11:31:51 CST 2019</span><br></pre></td></tr></table></figure>
+
+<h3 id="cron"><a href="#cron" class="headerlink" title="cron"></a>cron</h3><p>用于在托管主机上创建或者删除定时任务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">backup：对远程主机上的原任务计划内容修改之前做备份 </span><br><span class="line">cron_file：如果指定该选项，则用该文件替换远程主机上的cron.d目录下的用户的任务计划 </span><br><span class="line">day：日（1-31，*，*&#x2F;2,……） </span><br><span class="line">hour：小时（0-23，*，*&#x2F;2，……）  </span><br><span class="line">minute：分钟（0-59，*，*&#x2F;2，……） </span><br><span class="line">month：月（1-12，*，*&#x2F;2，……） </span><br><span class="line">weekday：周（0-7，*，……）</span><br><span class="line">job：要执行的任务，依赖于state&#x3D;present </span><br><span class="line">name：该任务的描述 </span><br><span class="line">special_time：指定什么时候执行，参数：reboot,yearly,annually,monthly,weekly,daily,hourly </span><br><span class="line">state：确认该任务计划是创建present还是删除absent</span><br><span class="line">user：以哪个用户的身份执行</span><br></pre></td></tr></table></figure>
+<p>示例命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible db -m cron -a <span class="string">'minute="*/10" job="/bin/echo hello" name="test cron job" state="present"'</span></span></span><br><span class="line">ubuntu1 | CHANGED =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": true, </span><br><span class="line">    "envs": [], </span><br><span class="line">    "jobs": [</span><br><span class="line">        "test cron job"</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> ansible all -a <span class="string">"crontab -l"</span></span></span><br><span class="line">ubuntu1 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash">Ansible: <span class="built_in">test</span> cron job</span></span><br><span class="line">*/10 * * * * /bin/echo hello</span><br></pre></td></tr></table></figure>
+
+<h3 id="copy"><a href="#copy" class="headerlink" title="copy"></a>copy</h3><p>向托管主机复制传输文件，与file模块类似</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">backup：在覆盖之前将原文件备份，备份文件包含时间信息。有两个选项：yes|no </span><br><span class="line">content：用于替代&quot;src&quot;,可以直接设定指定文件的值 </span><br><span class="line">dest：必选项。要将源文件复制到的远程主机的绝对路径，如果源文件是一个目录，那么该路径也必须是个目录 </span><br><span class="line">directory_mode：递归的设定目录的权限，默认为系统默认权限</span><br><span class="line">force：如果目标主机包含该文件，但内容不同，如果设置为yes，则强制覆盖，如果为no，则只有当目标主机的目标位置不存在该文件时，才复制。默认为yes</span><br><span class="line">others：所有的file模块里的选项都可以在这里使用</span><br><span class="line">src：要复制到远程主机的文件在本地的地址，可以是绝对路径，也可以是相对路径。如果路径是一个目录，它将递归复制。在这种情况下，如果路径使用&quot;&#x2F;&quot;来结尾，则只复制目录里的内容，如果没有使用&quot;&#x2F;&quot;来结尾，则包含目录在内的整个内容全部复制，类似于rsync。</span><br></pre></td></tr></table></figure>
+<p>命令示例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m copy -a <span class="string">'src=/etc/hosts dest=/tmp/ mode=640 backup=no'</span></span></span><br><span class="line">ubuntu1 | CHANGED =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": true, </span><br><span class="line">    "checksum": "a7005b8efc34b6a8cda3790a4e0861ef53f0c136", </span><br><span class="line">    "dest": "/tmp/hosts", </span><br><span class="line">    "gid": 1000, </span><br><span class="line">    "group": "fengjj", </span><br><span class="line">    "mode": "0640", </span><br><span class="line">    "owner": "fengjj", </span><br><span class="line">    "path": "/tmp/hosts", </span><br><span class="line">    "size": 292, </span><br><span class="line">    "state": "file", </span><br><span class="line">    "uid": 1000</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="file"><a href="#file" class="headerlink" title="file"></a>file</h3><p>操作设置托管主机上的文件，文件权限、创建目录等操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">force：需要在两种情况下强制创建软链接，一种是源文件不存在但之后会建立的情况下；另一种是目标软链接已存在,需要先取消之前的软链，然后创建新的软链，有两个选项：yes|no </span><br><span class="line">group：定义文件&#x2F;目录的属组 </span><br><span class="line">mode：定义文件&#x2F;目录的权限</span><br><span class="line">owner：定义文件&#x2F;目录的属主</span><br><span class="line">path：必选项，定义文件&#x2F;目录的路径</span><br><span class="line">recurse：递归的设置文件的属性，只对目录有效</span><br><span class="line">src：要被链接的源文件的路径，只应用于state&#x3D;link的情况</span><br><span class="line">dest：被链接到的路径，只应用于state&#x3D;link的情况 </span><br><span class="line">state：  directory：如果目录不存在，创建目录 file：即使文件不存在，也不会被创建 link：创建软链接 hard：创建硬链接 touch：如果文件不存在，则会创建一个新的文件，如果文件或目录已存在，则更新其最后修改时间 absent：删除目录、文件或者取消链接文件</span><br></pre></td></tr></table></figure>
+<p>命令示例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m file -a <span class="string">"src=/etc/fstab dest=/tmp/fstab state=link"</span></span></span><br><span class="line">ubuntu1 | CHANGED =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": true, </span><br><span class="line">    "dest": "/tmp/fstab", </span><br><span class="line">    "gid": 1000, </span><br><span class="line">    "group": "fengjj", </span><br><span class="line">    "mode": "0777", </span><br><span class="line">    "owner": "fengjj", </span><br><span class="line">    "size": 10, </span><br><span class="line">    "src": "/etc/fstab", </span><br><span class="line">    "state": "link", </span><br><span class="line">    "uid": 1000</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h3><p>在RHEL系的操作系统的托管机上安装卸载软件，在Debian系则使用apt模块，参数基本一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">config_file：yum的配置文件 </span><br><span class="line">disable_gpg_check：关闭gpg_check </span><br><span class="line">disablerepo：不启用某个源 </span><br><span class="line">enablerepo：启用某个源</span><br><span class="line">name：要进行操作的软件包的名字，也可以传递一个url或者一个本地的rpm包的路径 </span><br><span class="line">state：状态（present、installed安装，removed、absent卸载，latest最新）</span><br></pre></td></tr></table></figure>
+<p>命令示例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m yum -a <span class="string">'name=zsh state=latest'</span></span></span><br><span class="line">ubuntu1 | FAILED! =&gt; &#123;</span><br><span class="line">    "ansible_facts": &#123;</span><br><span class="line">        "discovered_interpreter_python": "/usr/bin/python"</span><br><span class="line">    &#125;, </span><br><span class="line">    "changed": false, </span><br><span class="line">    "cmd": "apt-get update", </span><br><span class="line">    "msg": "W: chmod 0700 of directory /var/lib/apt/lists/partial failed - SetupAPTPartialDirectory (1: Operation not permitted)\nE: Could not open lock file /var/lib/apt/lists/lock - open (13: Permission denied)\nE: Unable to lock directory /var/lib/apt/lists/\nW: Problem unlinking the file /var/cache/apt/pkgcache.bin - RemoveCaches (13: Permission denied)\nW: Problem unlinking the file /var/cache/apt/srcpkgcache.bin - RemoveCaches (13: Permission denied)", </span><br><span class="line">    "rc": 100, </span><br><span class="line">    "stderr": "W: chmod 0700 of directory /var/lib/apt/lists/partial failed - SetupAPTPartialDirectory (1: Operation not permitted)\nE: Could not open lock file /var/lib/apt/lists/lock - open (13: Permission denied)\nE: Unable to lock directory /var/lib/apt/lists/\nW: Problem unlinking the file /var/cache/apt/pkgcache.bin - RemoveCaches (13: Permission denied)\nW: Problem unlinking the file /var/cache/apt/srcpkgcache.bin - RemoveCaches (13: Permission denied)\n", </span><br><span class="line">    "stderr_lines": [</span><br><span class="line">        "W: chmod 0700 of directory /var/lib/apt/lists/partial failed - SetupAPTPartialDirectory (1: Operation not permitted)", </span><br><span class="line">        "E: Could not open lock file /var/lib/apt/lists/lock - open (13: Permission denied)", </span><br><span class="line">        "E: Unable to lock directory /var/lib/apt/lists/", </span><br><span class="line">        "W: Problem unlinking the file /var/cache/apt/pkgcache.bin - RemoveCaches (13: Permission denied)", </span><br><span class="line">        "W: Problem unlinking the file /var/cache/apt/srcpkgcache.bin - RemoveCaches (13: Permission denied)"</span><br><span class="line">    ], </span><br><span class="line">    "stdout": "Reading package lists...\n", </span><br><span class="line">    "stdout_lines": [</span><br><span class="line">        "Reading package lists..."</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h3><p>在托管主机上执行复杂指令或者执行脚本，<strong>支持管道符号和&amp;&amp;符号</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">chdir # 执行之前，先cd到指定目录在执行命令</span><br><span class="line"></span><br><span class="line">creates # 一个文件名，当这个文件存在，则该命令不执行</span><br><span class="line"></span><br><span class="line">executable # 切换shell来执行命令，需要使用命令的绝对路径</span><br><span class="line"></span><br><span class="line">free_form&#x3D; # 执行的命令</span><br><span class="line"></span><br><span class="line">removes # 一个文件名，这个文件不存在，则该命令不执行</span><br></pre></td></tr></table></figure>
+<p>示例命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># ansible all -m shell -a &#39;ps -ef|grep node&#39;</span><br><span class="line">ubuntu1 | CHANGED | rc&#x3D;0 &gt;&gt;</span><br><span class="line">fengjj    8913  1761 38 14:29 pts&#x2F;1    00:00:00 &#x2F;usr&#x2F;bin&#x2F;python &#x2F;home&#x2F;fengjj&#x2F;.local&#x2F;bin&#x2F;ansible all -m shell -a ps -ef|grep node</span><br><span class="line">fengjj    8918  8913  6 14:29 pts&#x2F;1    00:00:00 &#x2F;usr&#x2F;bin&#x2F;python &#x2F;home&#x2F;fengjj&#x2F;.local&#x2F;bin&#x2F;ansible all -m shell -a ps -ef|grep node</span><br><span class="line">fengjj    8982  8981  0 14:29 pts&#x2F;2    00:00:00 &#x2F;bin&#x2F;sh -c ps -ef|grep node</span><br><span class="line">fengjj    8984  8982  0 14:29 pts&#x2F;2    00:00:00 grep node</span><br></pre></td></tr></table></figure>
+
+<h3 id="script"><a href="#script" class="headerlink" title="script"></a>script</h3><p>在托管主机上，先复制后执行<strong>管理机上的指定脚本</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">chdir # 执行之前，先cd到指定目录在执行脚本</span><br><span class="line"></span><br><span class="line">creates # 一个文件名，当这个文件存在，则不传输并执行脚本</span><br><span class="line"></span><br><span class="line">executable # 切换shell来执行命令，需要使用脚本的绝对路径</span><br><span class="line"></span><br><span class="line">free_form&#x3D; # 执行的脚本路径</span><br><span class="line"></span><br><span class="line">removes # 一个文件名，这个文件不存在，则该传输并执行脚本</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>脚本将会传递到<br>命令示例</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ansible all -m script -a <span class="string">"/home/fengjj/test.sh"</span></span></span><br><span class="line">ubuntu1 | CHANGED =&gt; &#123;</span><br><span class="line">    "changed": true, </span><br><span class="line">    "rc": 0, </span><br><span class="line">    "stderr": "Shared connection to ubuntu1 closed.\r\n", </span><br><span class="line">    "stderr_lines": [</span><br><span class="line">        "Shared connection to ubuntu1 closed."</span><br><span class="line">    ], </span><br><span class="line">    "stdout": "123123123\r\n", </span><br><span class="line">    "stdout_lines": [</span><br><span class="line">        "123123123"</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="service"><a href="#service" class="headerlink" title="service"></a>service</h3><p>管理托管主机上的服务，支持设置/取消开机启动、重启、启动、关闭服务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">arguments：给命令行提供一些选项 </span><br><span class="line">enabled：是否开机启动 yes|no</span><br><span class="line">name：必选项，服务名称 </span><br><span class="line">pattern：定义一个模式，如果通过status指令来查看服务的状态时，没有响应，就会通过ps指令在进程中根据该模式进行查找，如果匹配到，则认为该服务依然在运行</span><br><span class="line">runlevel：运行级别</span><br><span class="line">sleep：如果执行了restarted，在则stop和start之间沉睡几秒钟</span><br><span class="line">state：对当前服务执行启动，停止、重启、重新加载等操作（started,stopped,restarted,reloaded）</span><br></pre></td></tr></table></figure>
+<p>命令示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m service -a &#39;name&#x3D;docker enabled&#x3D;yes&#39;</span><br></pre></td></tr></table></figure>
+
+<h1 id="主机文件"><a href="#主机文件" class="headerlink" title="主机文件"></a>主机文件</h1><p>主机允许分组，或者不分组，其格式类似ini文件。示例如下所示</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mail.example.com</span><br><span class="line"></span><br><span class="line"><span class="section">[webservers]</span></span><br><span class="line">foo.example.com</span><br><span class="line">bar.example.com</span><br><span class="line"></span><br><span class="line"><span class="section">[dbservers]</span></span><br><span class="line">one.example.com</span><br><span class="line">two.example.com</span><br><span class="line">three.example.com</span><br></pre></td></tr></table></figure>
+<p>如果端口号不是22，则需要在每行声明端口号，或者指定IP连接，类似下面的格式<br><code>jumper ansible_ssh_port=5555 ansible_ssh_host=192.168.1.50</code></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/979cd505.html">ansible入门（一）</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2020-03-02, 11:35:43</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/979cd505.html" title="ansible入门（一）">https://mrfengjian.github.io/post/979cd505.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/979cd505.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/ba2b6a0e.html">
+                    操作系统和常用软件的镜像设置
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/dd0d3a5a.html">
+                    在ubuntu上快速安装kubernetes
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装"><span class="toc-number">1.</span> <span class="toc-text">安装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#管理机要求"><span class="toc-number">1.1.</span> <span class="toc-text">管理机要求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#托管节点要求"><span class="toc-number">1.2.</span> <span class="toc-text">托管节点要求</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第一条命令"><span class="toc-number">2.</span> <span class="toc-text">第一条命令</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#模块"><span class="toc-number">3.</span> <span class="toc-text">模块</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用模块"><span class="toc-number">3.1.</span> <span class="toc-text">常用模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ping"><span class="toc-number">3.1.1.</span> <span class="toc-text">ping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#setup"><span class="toc-number">3.1.2.</span> <span class="toc-text">setup</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#command"><span class="toc-number">3.1.3.</span> <span class="toc-text">command</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cron"><span class="toc-number">3.1.4.</span> <span class="toc-text">cron</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#copy"><span class="toc-number">3.1.5.</span> <span class="toc-text">copy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#file"><span class="toc-number">3.1.6.</span> <span class="toc-text">file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yum"><span class="toc-number">3.1.7.</span> <span class="toc-text">yum</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shell"><span class="toc-number">3.1.8.</span> <span class="toc-text">shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#script"><span class="toc-number">3.1.9.</span> <span class="toc-text">script</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service"><span class="toc-number">3.1.10.</span> <span class="toc-text">service</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#主机文件"><span class="toc-number">4.</span> <span class="toc-text">主机文件</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"ansible入门（一）　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/ba2b6a0e.html" title="上一篇: 操作系统和常用软件的镜像设置">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/dd0d3a5a.html" title="下一篇: 在ubuntu上快速安装kubernetes">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="从2.3版本开始，spark原生支持kubernetes集群调度，享受云原生的技术红利。本文通过一个简单的演示介绍部署过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark on kubernetes部署demo">
+<meta property="og:url" content="https://mrfengjian.github.io/post/b3065445.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="从2.3版本开始，spark原生支持kubernetes集群调度，享受云原生的技术红利。本文通过一个简单的演示介绍部署过程。">
+<meta property="og:image" content="https://mrfengjian.github.io/post/b3065445/image-20200430111658509.png">
+<meta property="article:published_time" content="2020-05-09T02:59:45.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.680Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="kubernetes">
+<meta property="article:tag" content="spark">
+<meta property="article:tag" content="大数据">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/b3065445/image-20200430111658509.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>spark on kubernetes部署demo | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-spark-on-kubernetes-demo" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/b3065445.html" class="article-date">
+      <time datetime="2020-05-09T02:59:45.000Z" itemprop="datePublished">2020-05-09</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      spark on kubernetes部署demo
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>kubernetes以其完善的集群调度、资源管理、故障恢复等能力，已经成为事实上的容器集群管理标准。spark接入kubernetes后好处如下：</p>
+<ul>
+<li>统一调度：与其他kubernetes应用一起调度，简化技术栈依赖和管理孤岛</li>
+<li>多租户：可以利用kubernetes原生方案，对spark应用的资源占用进行细粒度的资源管理和隔离</li>
+<li>云原生生态：利用云原生的监控和管理方案，监测spark的性能，便于优化spark。</li>
+</ul>
+<h2 id="工作机制"><a href="#工作机制" class="headerlink" title="工作机制"></a>工作机制</h2><p><img src="/post/b3065445/image-20200430111658509.png" alt="image-20200430111658509"></p>
+<p>在kubernetes中运行spark的基本机制如上图所示：</p>
+<ol>
+<li>spark-submit直接向<code>kubernetes apiserver</code>发出请求，创建一个<code>driver pod</code></li>
+<li><code>driver pod</code>在集群内运行，并创建<code>executor pod</code>，然后与其连接，令<code>executor pod</code>自身执行应用的代码</li>
+<li>如果<code>executor pod</code>执行完毕，自动进入<code>terminated</code>状态，并被kubernetes集群回收，而<code>driver pod</code>则进入<code>completed</code>状态，可以被kubernetes集群在必要情况下手动或自动地进行回收。<strong>此时，<code>driver pod</code>不占用任何计算资源</strong></li>
+</ol>
+<blockquote>
+<p>启动<code>driver pod</code>和<code>executor pod</code>，可以通过参数配置，利用kubernetes原生调度机制，选择在哪些主机上启动。</p>
+</blockquote>
+<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><h3 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h3><p>默认spark镜像都是root用户进行启动，实际生产环境中可能不太会有安全漏洞，必要时可以自行修改构建镜像的Dockerfile，指定spark的启动用户。可以在<code>spark-submit</code>中，通过参数，指定POD以对应的用户启动</p>
+<h3 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h3><p>spark与kubernetes交互时，必须具备<strong>操作POD（list、get、create、delete、edit、watch）</strong>的权限，需要提前准备好，需要根据kubernetes的RBAC规则，为<code>driver pod</code>设置好具备权限的serviceaccount。</p>
+<ul>
+<li><p>默认<code>driver pod</code>使用名为default的serviceaccount，可以通过如下命令进行权限设置</p>
+<p><code>kubectl create rolebinding default-admin --clusterrole=admin --serviceaccount=default --namespace=default</code></p>
+<blockquote>
+<p>clusterrole是kubernetes集群自带的一类角色，用于操作集群资源。常见的有cluster-admin(集群内的最高权限)、admin(对集群内大多数资源的操作权限)等。也可以创建只在某个命名空间内有权限的角色，具体请参考官方文档。</p>
+</blockquote>
+</li>
+<li><p>也可以通过标准的RBAC设置方式，使用下面的设置，创建一个具备操作POD权限的serviceaccount，并在提交任务时指定使用这个serviceaccount。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-role</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">pods</span></span><br><span class="line">  <span class="attr">verbs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">list</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">watch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">delete</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">create</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deletecollection</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">patch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">update</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRoleBinding</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-role-binding</span></span><br><span class="line"><span class="attr">roleRef:</span></span><br><span class="line">  <span class="attr">apiGroup:</span> <span class="string">rbac.authorization.k8s.io</span></span><br><span class="line">  <span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-role</span></span><br><span class="line"><span class="attr">subjects:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>或者创建一个新的serviceaccount，设置使用kubernetes集群内置的管理角色。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl create serviceaccount spark</span><br><span class="line">kubectl create clusterrolebinding spark-role --clusterrole=admin --serviceaccount=spark --namespace=default</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h1 id="测试spark-on-kubernetes"><a href="#测试spark-on-kubernetes" class="headerlink" title="测试spark on kubernetes"></a>测试spark on kubernetes</h1><h2 id="环境要求-amp-说明"><a href="#环境要求-amp-说明" class="headerlink" title="环境要求&amp;说明"></a>环境要求&amp;说明</h2><ul>
+<li>spark 2.3版本以上</li>
+<li>kubernetes 1.6版本以上，并且在spark所在机器配置好了权限，可以通过kubectl创建资源。</li>
+<li>kubernetes必须启动了dns</li>
+<li>最好安装<code>kubernetes dashboard</code>或者其他图形界面，便于观察测试结果</li>
+<li>演示spark版本为<code>spark-2.4.4-bin-hadoop2.7</code>，kubernetes版本为<code>v1.18.2</code></li>
+<li>spark客户端设置好<code>JAVA_HOME</code></li>
+<li>kubernetes主机至少总计拥有8G内存，4核CPU，否则无法启动。</li>
+</ul>
+<h2 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h2><p>在spark的<strong>根目录</strong>，通过下列命令构建镜像：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./bin/docker-image-tool.sh -r spark -t 2.4.4 build</span><br><span class="line"><span class="comment"># 需要确保kubernetes所有主机都可以访问这个镜像仓库</span></span><br><span class="line">./bin/docker-image-tool.sh -r spark -t 2.4.4 push</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>minikube</code>之类的单主机kubernetes集群环境时，可以直接构建镜像，不需要push，最终产生如下一系列镜像。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ docker images|grep spark/spark                        </span><br><span class="line">spark/spark-r                                                                                      2.4.4               d56982d3b554        22 hours ago        759MB</span><br><span class="line">spark/spark-py                                                                                     2.4.4               c075ce165c49        23 hours ago        466MB</span><br><span class="line">spark/spark                                                                                        2.4.4               7672ffe1a0b2        24 hours ago        374MB</span><br></pre></td></tr></table></figure>
+
+
+
+<p>为简化测试流程，也可以直接使用Dockerfile进行构建</p>
+<p><code>docker build -t spark:2.4.4 -f ./kubernetes/dockerfiles/spark/Dockerfile  .</code></p>
+<h2 id="cluster模式提交应用"><a href="#cluster模式提交应用" class="headerlink" title="cluster模式提交应用"></a>cluster模式提交应用</h2><p>以自带的SparkPi为例直接<strong>使用客户端<code>spark-submit</code></strong>执行下列命令进行提交：</p>
+<blockquote>
+<p>要求当前用户下，用户有权限和配置来执行kubectl命令去操作POD。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ ./bin/spark-submit \</span><br><span class="line">--master k8s://http://192.168.137.150:6080 \</span><br><span class="line">--deploy-mode cluster \</span><br><span class="line">--name spark-pi \</span><br><span class="line">--class org.apache.spark.examples.SparkPi \</span><br><span class="line">--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \</span><br><span class="line">--conf spark.executor.instances=2 \</span><br><span class="line">--conf spark.kubernetes.container.image=spark/spark:2.4.4 \</span><br><span class="line"><span class="built_in">local</span>:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar</span><br></pre></td></tr></table></figure>
+
+<p>最终可以看到<code>driver pod</code>和<code>executor pod</code>正常运行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ kubectl get pods                       </span><br><span class="line">NAME                               READY   STATUS    RESTARTS   AGE</span><br><span class="line">spark-pi-1588666210091-driver      1/1     Running   0          12s</span><br><span class="line">spark-pi-1588666210091-exec-1      1/1     Running   0          6s</span><br><span class="line">spark-pi-1588666210091-exec-2      1/1     Running   0          6s</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><p>master地址默认为https协议，即<code>k8s://192.168.137.150:6443</code>等价于<code>k8s://https://192.1688.137.150:6443</code></p>
+</li>
+<li><p><code>spark.kubernetes.authenticate.driver.serviceAccountName</code>指定<code>driver pod</code>创建时使用的serviceaccount的名称，默认为default</p>
+</li>
+<li><p>local参数的jar包路径为镜像中jar包的路径，而不是客户端本地的路径，这个jar包应当已经打包进去了系统镜像。</p>
+</li>
+<li><p>更多配置项，请参考官方文档<a href="https://spark.apache.org/docs/latest/running-on-kubernetes.html#spark-properties" target="_blank" rel="noopener">spark-properties</a>。</p>
+</li>
+</ul>
+<p>启动完成后，<code>executor pod</code>会被清理，<code>driver pod</code>则变为Completed状态，可以通过如下命令查看<code>driver pod</code>的执行日志：</p>
+<p><code>kubectl logs spark-pi-1588666210091-driver</code></p>
+<h2 id="client模式提交应用"><a href="#client模式提交应用" class="headerlink" title="client模式提交应用"></a>client模式提交应用</h2><h2 id="通过yaml提交应用"><a href="#通过yaml提交应用" class="headerlink" title="通过yaml提交应用"></a>通过yaml提交应用</h2><p>通过yaml定义<code>driver pod</code>，然后由<code>driver pod</code>来启动<code>executor pod</code>，因此要保证<code>driver pod</code>使用的serviceaccount具备操作POD的权限。实质上就是把<code>spark-submit</code>的功能转换为yaml的定义，因此需要对spark的参数配置很了解才能比较好的定义。</p>
+<p>示例yaml内容如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="comment"># 创建具备操作POD权限的serviceaccount  </span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRoleBinding</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-role-binding</span></span><br><span class="line"><span class="attr">roleRef:</span></span><br><span class="line">  <span class="attr">apiGroup:</span> <span class="string">rbac.authorization.k8s.io</span></span><br><span class="line">  <span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">edit</span></span><br><span class="line"><span class="attr">subjects:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment">#需要确保每个应用的服务名称不重复，相关label需要自行生成惟一的关联值</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">sparkpi-spark-driver-svc</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">clusterIP:</span> <span class="string">None</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">driver-rpc-port</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">7078</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="number">7078</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">blockmanager</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">7079</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="number">7079</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">spark-app-selector:</span> <span class="string">spark-9b7952456a86413b94c70fe2b3f8496c</span></span><br><span class="line">    <span class="attr">spark-role:</span> <span class="string">driver</span></span><br><span class="line">  <span class="attr">sessionAffinity:</span> <span class="string">None</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># configmap定义spark应用的启动参数</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">spark.properties:</span> <span class="string">|</span></span><br><span class="line">    <span class="string">spark.kubernetes.driver.pod.name=spark-pi-9b7952456a86413b94c70fe2b3f8496c-driver</span></span><br><span class="line">    <span class="string">spark.driver.host=sparkpi-spark-driver-svc.default.svc</span></span><br><span class="line">    <span class="string">spark.kubernetes.container.image=spark\:2.4.4</span></span><br><span class="line">    <span class="string">spark.executor.instances=2</span></span><br><span class="line">    <span class="string">spark.app.id=spark-9b7952456a86413b94c70fe2b3f8496c</span></span><br><span class="line">    <span class="string">spark.app.name=spark-pi</span></span><br><span class="line">    <span class="string">spark.driver.port=7078</span></span><br><span class="line">    <span class="string">spark.kubernetes.resource.type=java</span></span><br><span class="line">    <span class="string">spark.master=k8s\://http\://192.168.137.150\:6080</span></span><br><span class="line">    <span class="string">spark.kubernetes.python.pyFiles=</span></span><br><span class="line">    <span class="string">spark.kubernetes.executor.podNamePrefix=spark-pi-9b7952456a86413b94c70fe2b3f8496c</span></span><br><span class="line">    <span class="string">spark.driver.blockManager.port=7079</span></span><br><span class="line">    <span class="string">spark.jars=/opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar</span></span><br><span class="line">    <span class="string">spark.submit.deployMode=cluster</span></span><br><span class="line">    <span class="string">spark.kubernetes.submitInDriver=true</span></span><br><span class="line">    <span class="string">spark.kubernetes.authenticate.driver.serviceAccountName=spark</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-pi-9b7952456a86413b94c70fe2b3f8496c-driver-conf-map</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">"Pod"</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">"v1"</span></span><br><span class="line"><span class="attr">metadata:</span> </span><br><span class="line">  <span class="attr">name:</span> <span class="string">"spark-pi-9b7952456a86413b94c70fe2b3f8496c-driver"</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">"default"</span></span><br><span class="line">  <span class="attr">labels:</span> </span><br><span class="line">    <span class="attr">spark-app-selector:</span> <span class="string">"spark-9b7952456a86413b94c70fe2b3f8496c"</span></span><br><span class="line">    <span class="attr">spark-role:</span> <span class="string">"driver"</span></span><br><span class="line"><span class="attr">spec:</span> </span><br><span class="line">  <span class="attr">volumes:</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-local-dir-1"</span></span><br><span class="line">    <span class="attr">emptyDir:</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-conf-volume"</span></span><br><span class="line">    <span class="attr">configMap:</span> </span><br><span class="line">      <span class="attr">name:</span> <span class="string">"spark-pi-9b7952456a86413b94c70fe2b3f8496c-driver-conf-map"</span></span><br><span class="line">      <span class="attr">defaultMode:</span> <span class="number">420</span></span><br><span class="line">  <span class="attr">containers:</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-kubernetes-driver"</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">"spark:2.4.4"</span></span><br><span class="line">    <span class="attr">args:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="string">"driver"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"--properties-file"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"/opt/spark/conf/spark.properties"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"--class"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"org.apache.spark.examples.SparkPi"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"spark-internal"</span></span><br><span class="line">    <span class="attr">ports:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"driver-rpc-port"</span></span><br><span class="line">      <span class="attr">containerPort:</span> <span class="number">7078</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">"TCP"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"blockmanager"</span></span><br><span class="line">      <span class="attr">containerPort:</span> <span class="number">7079</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">"TCP"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-ui"</span></span><br><span class="line">      <span class="attr">containerPort:</span> <span class="number">4040</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">"TCP"</span></span><br><span class="line">    <span class="attr">env:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"SPARK_DRIVER_BIND_ADDRESS"</span></span><br><span class="line">      <span class="attr">valueFrom:</span> </span><br><span class="line">        <span class="attr">fieldRef:</span> </span><br><span class="line">          <span class="attr">apiVersion:</span> <span class="string">"v1"</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">"status.podIP"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"SPARK_LOCAL_DIRS"</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">"/var/data/spark-9b7952456a86413b94c70fe2b3f8496c"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"SPARK_CONF_DIR"</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">"/opt/spark/conf"</span></span><br><span class="line">    <span class="attr">resources:</span> </span><br><span class="line">      <span class="attr">limits:</span> </span><br><span class="line">        <span class="attr">memory:</span> <span class="string">"1408Mi"</span></span><br><span class="line">      <span class="attr">requests:</span> </span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">"1"</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">"1408Mi"</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">"IfNotPresent"</span></span><br><span class="line">    <span class="attr">volumeMounts:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-conf-volume"</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">"/opt/spark/conf"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"spark-local-dir-1"</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">"/var/data/spark-9b7952456a86413b94c70fe2b3f8496c"</span>  </span><br><span class="line">  <span class="attr">restartPolicy:</span> <span class="string">"Never"</span></span><br><span class="line">  <span class="attr">serviceAccountName:</span> <span class="string">"spark"</span></span><br></pre></td></tr></table></figure>
+
+<p>直接使用<code>kubectl create -f</code>创建即可拉起应用。</p>
+<h2 id="spark-operator提交应用"><a href="#spark-operator提交应用" class="headerlink" title="spark operator提交应用"></a>spark operator提交应用</h2><p>通过yaml或者脚本提交应用毕竟比较复杂，实际使用起来不太方便。<a href="https://github.com/GoogleCloudPlatform/spark-on-k8s-operator" target="_blank" rel="noopener">Spark Operator</a> 就是为了解决在Kubernetes集群部署并维护Spark应用而开发的，Spark Operator是经典的CRD + Controller，即Kubernetes Operator的实现，定义了如下两种资源类型的spark应用，具体使用方式可以参考<a href="https://github.com/GoogleCloudPlatform/spark-on-k8s-operator/tree/master/examples" target="_blank" rel="noopener">社区案例</a>。</p>
+<ul>
+<li><p><strong>SparkApplication</strong>：单次spark应用的运行定义。</p>
+</li>
+<li><p><strong>ScheduledSparkApplication</strong>：SparkApplication的升级，带有自定义时间调度策略的作业提交，比如cron表达式或者语义化的周期定义表达式。</p>
+</li>
+</ul>
+<h3 id="安装sparkoperator"><a href="#安装sparkoperator" class="headerlink" title="安装sparkoperator"></a>安装sparkoperator</h3><p>社区推荐使用helm3进行安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator</span><br><span class="line">helm install incubator/sparkoperator --namespace spark-operator</span><br></pre></td></tr></table></figure>
+
+<h3 id="提交spark应用"><a href="#提交spark应用" class="headerlink" title="提交spark应用"></a>提交spark应用</h3><p>安装完成后，使用如下yaml定义应用：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">"sparkoperator.k8s.io/v1beta2"</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">SparkApplication</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">spark-pi</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">Scala</span></span><br><span class="line">  <span class="attr">mode:</span> <span class="string">cluster</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">"spark:2.4.4"</span></span><br><span class="line">  <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">  <span class="attr">mainClass:</span> <span class="string">org.apache.spark.examples.SparkPi</span></span><br><span class="line">  <span class="attr">mainApplicationFile:</span> <span class="string">"local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar"</span></span><br><span class="line">  <span class="attr">sparkVersion:</span> <span class="string">"2.4.4"</span></span><br><span class="line">  <span class="attr">restartPolicy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">Never</span></span><br><span class="line">  <span class="attr">driver:</span></span><br><span class="line">    <span class="attr">labels:</span></span><br><span class="line">      <span class="attr">version:</span> <span class="number">2.4</span><span class="number">.4</span></span><br><span class="line">    <span class="attr">serviceAccount:</span> <span class="string">spark</span></span><br><span class="line">  <span class="attr">executor:</span></span><br><span class="line">    <span class="attr">cores:</span> <span class="number">1</span></span><br><span class="line">    <span class="attr">instances:</span> <span class="number">1</span></span><br><span class="line">    <span class="attr">memory:</span> <span class="string">"512m"</span></span><br><span class="line">    <span class="attr">labels:</span></span><br><span class="line">      <span class="attr">version:</span> <span class="number">2.4</span><span class="number">.4</span></span><br></pre></td></tr></table></figure>
+
+<p>使用命令<code>kubectl apply -f</code>以后，自动拉起<code>driver pod</code>和<code>executor pod</code>来启动应用。</p>
+<h2 id="问题处理"><a href="#问题处理" class="headerlink" title="问题处理"></a>问题处理</h2><ol>
+<li><p>如果提交时，出现下列异常：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">20/05/05 07:42:50 WARN WatchConnectionManager: Exec Failure: HTTP 403, Status: 403 - </span><br><span class="line">java.net.ProtocolException: Expected HTTP 101 response but was <span class="string">'403 Forbidden'</span></span><br><span class="line">	at okhttp3.internal.ws.RealWebSocket.checkResponse(RealWebSocket.java:216)</span><br><span class="line">	at okhttp3.internal.ws.RealWebSocket<span class="variable">$2</span>.onResponse(RealWebSocket.java:183)</span><br><span class="line">	at okhttp3.RealCall<span class="variable">$AsyncCall</span>.execute(RealCall.java:141)</span><br><span class="line">	at okhttp3.internal.NamedRunnable.run(NamedRunnable.java:32)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor<span class="variable">$Worker</span>.run(ThreadPoolExecutor.java:624)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line">20/05/05 07:42:50 WARN ExecutorPodsWatchSnapshotSource: Kubernetes client has been closed (this is expected <span class="keyword">if</span> the application is shutting down.)</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"kubernetes-dispatcher-0"</span> 20/05/05 07:42:50 ERROR SparkContext: Error initializing SparkContext.</span><br><span class="line">io.fabric8.kubernetes.client.KubernetesClientException:</span><br></pre></td></tr></table></figure>
+
+<p>可能是由于kubernetes-client的jar包版本比较老，EKS安全补丁导致的kubernetes-client无法使用，更新spark根目录jars中的如下三个jar包即可。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubernetes-client-xxxxxxx.jar</span><br><span class="line">kubernetes-model-xxx.jar</span><br><span class="line">kubernetes-model-common-xxx.jar</span><br></pre></td></tr></table></figure>
+
+<p>删除旧版本，然后下载4.4.2版本即可。示例：</p>
+<p>wget <a href="https://repo1.maven.org/maven2/io/fabric8/kubernetes-model/4.4.2/kubernetes-model-4.4.2.jar" target="_blank" rel="noopener">https://repo1.maven.org/maven2/io/fabric8/kubernetes-model/4.4.2/kubernetes-model-4.4.2.jar</a></p>
+<p>然后重新build镜像，使用新的镜像重新提交任务即可。</p>
+</li>
+<li><p>使用单主机kubernetes集群测试时，主机至少要有4核CPU，否则<code>executor pod</code>会因为CPU资源不足而被挂起调度。</p>
+</li>
+<li><p>如果提交时出现如下异常：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> io.fabric8.kubernetes.client.KubernetesClientException: Operation: [create]  <span class="keyword">for</span> kind: [Pod]  with name: [null]  <span class="keyword">in</span> namespace: [default]  failed.</span><br><span class="line">        at io.fabric8.kubernetes.client.KubernetesClientException.launderThrowable(KubernetesClientException.java:64)</span><br><span class="line">        at io.fabric8.kubernetes.client.KubernetesClientException.launderThrowable(KubernetesClientException.java:72)</span><br><span class="line">        at io.fabric8.kubernetes.client.dsl.base.BaseOperation.create(BaseOperation.java:364)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.Client$<span class="variable">$anonfun</span><span class="variable">$run</span><span class="variable">$2</span>.apply(KubernetesClientApplication.scala:141)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.Client$<span class="variable">$anonfun</span><span class="variable">$run</span><span class="variable">$2</span>.apply(KubernetesClientApplication.scala:140)</span><br><span class="line">        at org.apache.spark.util.Utils$.tryWithResource(Utils.scala:2543)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.Client.run(KubernetesClientApplication.scala:140)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.KubernetesClientApplication$<span class="variable">$anonfun</span><span class="variable">$run</span><span class="variable">$5</span>.apply(KubernetesClientApplication.scala:250)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.KubernetesClientApplication$<span class="variable">$anonfun</span><span class="variable">$run</span><span class="variable">$5</span>.apply(KubernetesClientApplication.scala:241)</span><br><span class="line">        at org.apache.spark.util.Utils$.tryWithResource(Utils.scala:2543)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.KubernetesClientApplication.run(KubernetesClientApplication.scala:241)</span><br><span class="line">        at org.apache.spark.deploy.k8s.submit.KubernetesClientApplication.start(KubernetesClientApplication.scala:204)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit.org<span class="variable">$apache</span><span class="variable">$spark</span><span class="variable">$deploy</span><span class="variable">$SparkSubmit</span>$<span class="variable">$runMain</span>(SparkSubmit.scala:845)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit.doRunMain<span class="variable">$1</span>(SparkSubmit.scala:161)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit.submit(SparkSubmit.scala:184)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit.doSubmit(SparkSubmit.scala:86)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit$<span class="variable">$anon</span><span class="variable">$2</span>.doSubmit(SparkSubmit.scala:920)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:929)</span><br><span class="line">        at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)</span><br><span class="line">Caused by: java.net.SocketException: Broken pipe (Write failed)</span><br><span class="line">        at java.net.SocketOutputStream.socketWrite0(Native Method)</span><br></pre></td></tr></table></figure>
+
+<p>应该是因为kubernetes-client的版本不兼容kubernetes环境的版本，可参考kubernetes-client 包的<a href="https://github.com/fabric8io/kubernetes-client/blob/master/README.md#compatibility-matrix" target="_blank" rel="noopener">版本支持矩阵</a>。升级kubernetes-client或者降级kubernetes环境版本即可，也可以如上面的例子，打开kubernetes的insecure端口，使用http进行接口调用。</p>
+</li>
+<li><p>提交时不在kubernetes集群中，可能会出现如下异常：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">19/05/14 10:38:52 WARN client.Config: Error reading service account token from: [/var/run/secrets/kubernetes.io/serviceaccount/token]. Ignoring.</span><br><span class="line">19/05/14 10:38:53 WARN internal.WatchConnectionManager: Exec Failure</span><br><span class="line">javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target</span><br><span class="line">	at sun.security.ssl.Alerts.getSSLException(Alerts.java:192)</span><br><span class="line">	at sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1949)</span><br><span class="line">	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:302)</span><br><span class="line">	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:296)</span><br><span class="line">	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1509)</span><br><span class="line">	at sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:216)</span><br><span class="line">	at sun.security.ssl.Handshaker.processLoop(Handshaker.java:979)</span><br></pre></td></tr></table></figure>
+
+<p>这是由于使用https时，访问kubernetes apiserver时，没有对应ca证书导致的，增加设置加载即可。</p>
+<p><code>&quot;spark.kubernetes.authenticate.caCertFile&quot;:&quot;target/classes/ca.crt&quot;</code></p>
+<p>并且需要设置token来进行权限设置。</p>
+<p><code>&quot;spark.kubernetes.authenticate.oauthToken&quot;:&quot;XXXXX&quot;</code></p>
+<p>token可以通过命令<code>kubectl describe secret $(kubectl get secrets |grep spark|awk &#39;{print $1}&#39;)</code>来查看spark serviceaccount的详情进行查看，示例如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ kubectl describe secret $(kubectl get secrets |grep spark|awk <span class="string">'&#123;print $1&#125;'</span>)</span><br><span class="line">Name:         spark-token-t76wt</span><br><span class="line">Namespace:    default</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: spark</span><br><span class="line">              kubernetes.io/service-account.uid: 47ff655c-2cba-43d4-b36a-479d38077bcd</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">namespace:  7 bytes</span><br><span class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6Im5NMW5hNU9MSklvYTdEY3E2b1NFTk0xWFhnRndWUlcyYWRnU21KN0k1SlUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNwYXJrLXRva2VuLXQ3Nnd0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6InNwYXJrIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNDdmZjY1NWMtMmNiYS00M2Q0LWIzNmEtNDc5ZDM4MDc3YmNkIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OmRlZmF1bHQ6c3BhcmsifQ.MomW8YtkFVKFrE5pixDrPfS7idou09m67_JrBPVzt7CNX-O26iK0fstxsFf6qyf8mHuE3absXWFOrnwKrgI8xMdkCuBJqDd0-BMVbvyt0lWW9elTETdAlmM8sDZO2R3rrCcQK8RX97ZqkBUNiI8Wmym0kUj4Co0QYmDwkp3fZ1LHdlHMmAHXEJsDPaD0aTOrBVBTqjjLObzQ3NUveAZZb-zeQLklbEMIg0nceZTRdedq2x5IqmSLTS7w2bBlzg3Mdqc-GrOnjF3mkfpAGDStgPjwKM5XxhB4hg3o0NEt2i2NGCrGELrKEDpcEkFk5h1P_CG7LXZljXHeMle70mz0Fg</span><br><span class="line">ca.crt:     1025 bytes</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h1 id="spark应用jar分发"><a href="#spark应用jar分发" class="headerlink" title="spark应用jar分发"></a>spark应用jar分发</h1><p>测试过程中，我们可以直接使用本地或者打包到镜像中应用jar包，但部署得到生产集群环境时，必须考虑分发方案的问题，主要有以下几种方式：</p>
+<ul>
+<li>打包到镜像中：基于社区Dockerfile，将新的应用打包到镜像中，然后通过配置<code>spark.kubernetes.executor.container.image</code>指定应用所使用的的镜像，然后再提交应用时，即可使用镜像本地文件的方式来启动应用。</li>
+<li>提交到HDFS集群：采用传统方式，使用HDFS集群，新的应用打包后提交到HDFS集群中，提交应用时，通过HDFS文件地址启动应用。</li>
+<li>提交到HTTP/FTP服务：采用传统方式，提交到HTTP/FTP等文件网络服务上，提交应用时，通过URL指示应用jar包地址来启动应用。</li>
+</ul>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/b3065445.html">spark on kubernetes部署demo</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2020-05-09, 10:59:45</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/b3065445.html" title="spark on kubernetes部署demo">https://mrfengjian.github.io/post/b3065445.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/b3065445.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/3f14187a.html">
+                    sparkoperator墙内使用指南
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/93953441.html">
+                    kubernetes-dashboard部署demo
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#工作机制"><span class="toc-number">1.1.</span> <span class="toc-text">工作机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#约束"><span class="toc-number">1.2.</span> <span class="toc-text">约束</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#用户"><span class="toc-number">1.2.1.</span> <span class="toc-text">用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#权限"><span class="toc-number">1.2.2.</span> <span class="toc-text">权限</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#测试spark-on-kubernetes"><span class="toc-number">2.</span> <span class="toc-text">测试spark on kubernetes</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#环境要求-amp-说明"><span class="toc-number">2.1.</span> <span class="toc-text">环境要求&amp;说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#构建镜像"><span class="toc-number">2.2.</span> <span class="toc-text">构建镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cluster模式提交应用"><span class="toc-number">2.3.</span> <span class="toc-text">cluster模式提交应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#client模式提交应用"><span class="toc-number">2.4.</span> <span class="toc-text">client模式提交应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过yaml提交应用"><span class="toc-number">2.5.</span> <span class="toc-text">通过yaml提交应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#spark-operator提交应用"><span class="toc-number">2.6.</span> <span class="toc-text">spark operator提交应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装sparkoperator"><span class="toc-number">2.6.1.</span> <span class="toc-text">安装sparkoperator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#提交spark应用"><span class="toc-number">2.6.2.</span> <span class="toc-text">提交spark应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题处理"><span class="toc-number">2.7.</span> <span class="toc-text">问题处理</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#spark应用jar分发"><span class="toc-number">3.</span> <span class="toc-text">spark应用jar分发</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"spark on kubernetes部署demo　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/3f14187a.html" title="上一篇: sparkoperator墙内使用指南">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/93953441.html" title="下一篇: kubernetes-dashboard部署demo">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="go语言智能合约开发基本流程和重要的内置接口介绍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="智能合约开发指南">
+<meta property="og:url" content="https://mrfengjian.github.io/post/6cc685c6.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="go语言智能合约开发基本流程和重要的内置接口介绍">
+<meta property="og:image" content="https://mrfengjian.github.io/post/6cc685c6/custom_events_content.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/6cc685c6/1536820637941.png">
+<meta property="article:published_time" content="2018-12-30T07:30:16.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.643Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="fabric">
+<meta property="article:tag" content="智能合约">
+<meta property="article:tag" content="chaincode">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/6cc685c6/custom_events_content.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>智能合约开发指南 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-chain_code_development_guide" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/6cc685c6.html" class="article-date">
+      <time datetime="2018-12-30T07:30:16.000Z" itemprop="datePublished">2018-12-30</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      智能合约开发指南
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <a id="more"></a>
+
+<h1 id="最简合约"><a href="#最简合约" class="headerlink" title="最简合约"></a>最简合约</h1><p>fabric的智能合约规范需要定义一个struct（结构体的名称不限），然后在该struct上定义Init和Invoke两个函数，定义main函数为启动入口，下面是社区最简单合约的模板，一切合约都需要在此基础上进行扩展：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"github.com/hyperledger/fabric/core/chaincode/shim"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	pb <span class="string">"github.com/hyperledger/fabric/protos/peer"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> FoozyCode <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	err := shim.Start(<span class="built_in">new</span>(FoozyCode))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Error starting chain code: %s"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(fuzzy *FoozyCode)</span> <span class="title">Init</span><span class="params">(stub shim.ChaincodeStubInterface)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> shim.Success(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//peer的invoke和query都是调用此方法实现的</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(fuzzy *FoozyCode)</span> <span class="title">Invoke</span><span class="params">(stub shim.ChaincodeStubInterface)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="comment">//shim.Error产生异常响应，通知操作失败</span></span><br><span class="line">	<span class="comment">//shim.Error("error test")</span></span><br><span class="line">	<span class="comment">//shim.Success产生正常响应，通知操作成功</span></span><br><span class="line">	<span class="keyword">return</span> shim.Success(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在Invoke和Init中，开发者可以根据需要再进行扩展。同时，shim提供了一系列接口，供开发者调用使用。</p>
+<blockquote>
+<p>由于智能合约本身是无法直接访问账本的，必须通过gprc调用peer来操作账本，因此目前开发者也只能使用shim提供的接口来开发自定义合约。</p>
+</blockquote>
+<h1 id="智能合约接口"><a href="#智能合约接口" class="headerlink" title="智能合约接口"></a>智能合约接口</h1><h2 id="请求参数获取"><a href="#请求参数获取" class="headerlink" title="请求参数获取"></a>请求参数获取</h2><ul>
+<li>GetArgs():<code>[][]byte</code>，调用参数以二维数组方式获取。</li>
+<li>GetStringArgs:<code>[]string</code>，调用参数解析为字符串数组，如果无法转换可能出现乱码</li>
+<li>GetFuntionAndParameters:<code>string,[]string</code>，调用参数解析为字符串数组，以第一个为函数名，后面为参数数组，如果一个参数都没有，则两个都是空值</li>
+<li>GetArgsSlice():<code>[]byte</code>，将调用参数的二维数组强行转换为一维数组</li>
+<li>GetTransient():<code>map[string][]byte,error</code>，比较少用，用于存放调用提案中的瞬态参数，只在背书过程中使用，不会被记入账本，因此通常用来存放密钥等私密信息。</li>
+</ul>
+<h2 id="提取调用者身份"><a href="#提取调用者身份" class="headerlink" title="提取调用者身份"></a>提取调用者身份</h2><ul>
+<li>GetCreator():<code>[]byte,error</code>，获取调用者的身份证书，其内容为证书字符串，可以通过x509类库转换读取证书判断信息。现在fabric提供了cid类库可以直接进行相关操作，它通过golang的protobuf将creator转换为可用的身份信息</li>
+<li>cid.GetID():<code>string,error</code>，获取调用者的身份，实际使用证书的subject和issuer用base64编码生成的字符串</li>
+<li>cid.GetMSPID():<code>string,error</code>，获取调用者的组织msp id</li>
+<li>cid.GetX509Certificate():<code>*x509.Certificate,error</code>，获取调用者的证书，已经完成转换</li>
+<li>cid.GetAttributeValue(att ):<code>value string,error</code>，获取调用者证书上的扩展属性值</li>
+<li>cid.AssertAttributeValue(attName,value ):<code>error</code>，判断调用者证书上的扩展属性值是否匹配指定值</li>
+</ul>
+<p>示例合约函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode01)</span> <span class="title">getCreator</span><span class="params">(stub shim.ChaincodeStubInterface)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	id, _ := cid.GetID(stub)</span><br><span class="line">	mspId, _ := cid.GetMSPID(stub)</span><br><span class="line">	<span class="comment">//获取证书上通过fabric-ca增加的额外自定义属性</span></span><br><span class="line">	<span class="comment">//cid.GetAttributeValue(stub,"")</span></span><br><span class="line">	<span class="comment">//读取整个证书，可用于获取其他属性</span></span><br><span class="line">	certs, _ := cid.GetX509Certificate(stub)</span><br><span class="line">	<span class="comment">//creator字节码转换为字符串后，可见调用者身份和证书信息，使用protobuf解析后可获取这些身份</span></span><br><span class="line">	bs, _ := stub.GetCreator()</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(bs))</span><br><span class="line">	data := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">	<span class="comment">//需要base64解码获取cn</span></span><br><span class="line">	idBytes, _ := base64.StdEncoding.DecodeString(id)</span><br><span class="line">	data[<span class="string">"id"</span>] = <span class="keyword">string</span>(idBytes)</span><br><span class="line">	data[<span class="string">"cn"</span>] = certs.Subject.CommonName</span><br><span class="line">	data[<span class="string">"msp_id"</span>] = mspId</span><br><span class="line">	data[<span class="string">"issuer"</span>] = certs.Issuer</span><br><span class="line">	data[<span class="string">"validity_start"</span>] = certs.NotBefore</span><br><span class="line">	data[<span class="string">"validity_end"</span>] = certs.NotAfter</span><br><span class="line">	data[<span class="string">"subject"</span>] = certs.Subject</span><br><span class="line">	dataBytes, _ := json.Marshal(data)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(dataBytes)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例输出</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜ peer chaincode query -C channel1 -n cc1 -c '&#123;"Args":["getCreator"]&#125;'</span><br><span class="line">2018-09-12 09:26:04.690 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 09:26:04.690 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: &#123;"cn":"Admin@org1.demo.com","id":"x509::CN=Admin@org1.demo.com,OU=client,L=Xi'An,ST=ShaanXi,C=CN::CN=ca.org1.demo.com,O=org1.demo.com,L=Xi'An,ST=ShaanXi,C=CN","issuer":&#123;"Country":["CN"],"Organization":["org1.demo.com"],"OrganizationalUnit":null,"Locality":["Xi'An"],"Province":["ShaanXi"],"StreetAddress":null,"PostalCode":null,"SerialNumber":"","CommonName":"ca.org1.demo.com","Names":[&#123;"Type":[2,5,4,6],"Value":"CN"&#125;,&#123;"Type":[2,5,4,8],"Value":"ShaanXi"&#125;,&#123;"Type":[2,5,4,7],"Value":"Xi'An"&#125;,&#123;"Type":[2,5,4,10],"Value":"org1.demo.com"&#125;,&#123;"Type":[2,5,4,3],"Value":"ca.org1.demo.com"&#125;],"ExtraNames":null&#125;,"msp_id":"org1","subject":&#123;"Country":["CN"],"Organization":null,"OrganizationalUnit":["client"],"Locality":["Xi'An"],"Province":["ShaanXi"],"StreetAddress":null,"PostalCode":null,"SerialNumber":"","CommonName":"Admin@org1.demo.com","Names":[&#123;"Type":[2,5,4,6],"Value":"CN"&#125;,&#123;"Type":[2,5,4,8],"Value":"ShaanXi"&#125;,&#123;"Type":[2,5,4,7],"Value":"Xi'An"&#125;,&#123;"Type":[2,5,4,11],"Value":"client"&#125;,&#123;"Type":[2,5,4,3],"Value":"Admin@org1.demo.com"&#125;],"ExtraNames":null&#125;,"validity_end":"2028-09-09T01:02:10Z","validity_start":"2018-09-12T01:02:10Z"&#125;</span><br><span class="line">2018-09-12 09:26:04.696 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+<h2 id="存取数据"><a href="#存取数据" class="headerlink" title="存取数据"></a>存取数据</h2><ul>
+<li><p>GetState(key string):<code>[]byte,error</code>,如果不存在，则为nil，ni。在同一交易中Put的数据不会被Get最新值。<strong>使用query调用GetState不会产生交易，但是用invoke调用GetState会产生读写集不需要写的交易区块</strong></p>
+</li>
+<li><p>PutState(key string,value []byte):<code>error</code>存入数据，在交易中产生writeset记录，key不能以空字符（0x00）开始，避免与复合key冲突。<strong>任何需要写入数据的方法，使用query调用时，不会产生任何效果，但使用invoke可以调用只包含query的方法</strong></p>
+</li>
+<li><p>DelState(key string):<code>error</code>，删除key对应的key、value，在交易中产生writeset记录，不存在则产生异常。</p>
+</li>
+<li><p>GetStateByRange(start,end string):<code>StateQueryIteratorInterface,error</code>，按key做范围查询，范围一个迭代器，用于遍历结果集，结果按key的字典顺序进行遍历。范围为左开右闭，即最小包括起始值，但不包括终止值。</p>
+<p><em>预设存储了[a:valueXX,a0:a0,a1:a1,b:b]四对键值对</em></p>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode01)</span> <span class="title">getRange</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"invalid args length"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	start, end := args[<span class="number">0</span>], args[<span class="number">1</span>]</span><br><span class="line">	<span class="comment">//左开右闭原则，包含start值，不包含end值</span></span><br><span class="line">	result, err := stub.GetStateByRange(start, end)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> result.Close()</span><br><span class="line">	data := <span class="built_in">make</span>([]<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;, <span class="number">0</span>)</span><br><span class="line">	<span class="keyword">for</span> result.HasNext() &#123;</span><br><span class="line">		item, err := result.Next()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">		m := <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">			<span class="string">"key"</span>:   item.Key,</span><br><span class="line">			<span class="string">"value"</span>: <span class="keyword">string</span>(item.Value),</span><br><span class="line">			<span class="comment">//对简单key，namespace即为合约名称</span></span><br><span class="line">			<span class="string">"namespace"</span>: item.Namespace,</span><br><span class="line">		&#125;</span><br><span class="line">		data = <span class="built_in">append</span>(data, m)</span><br><span class="line">	&#125;</span><br><span class="line">	dataBytes, _ := json.Marshal(data)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(dataBytes)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例查询输出（左开右闭，不包含key为b的数据记录）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜  peer chaincode query -C channel1 -n cc1 -c '&#123;"Args":["rangeQuery","a","b"]&#125;' </span><br><span class="line">2018-09-12 10:06:07.825 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 10:06:07.825 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: [&#123;"key":"a","namespace":"cc1","value":"valueXX"&#125;,&#123;"key":"a0","namespace":"cc1","value":"a0"&#125;,&#123;"key":"a1","namespace":"cc1","value":"a1"&#125;]</span><br><span class="line">2018-09-12 10:06:07.832 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>GetHistoryForKey(key string):<code>HistoryQueryIteratorInterface,error</code>，获取key的历史数据，如果key始终不存在，不报错。<strong>如果key已经被删除，可以查询出历史值</strong>。core.yaml中配置项<em>core.ledger.history.enableHistoryDatabase</em>为false时无法查询历史。</p>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode01)</span> <span class="title">getKeyHistory</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"invalid args length"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	key := args[<span class="number">0</span>]</span><br><span class="line">	result, err := stub.GetHistoryForKey(key)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> result.Close()</span><br><span class="line">	data := <span class="built_in">make</span>([]<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;, <span class="number">0</span>)</span><br><span class="line">	<span class="keyword">for</span> result.HasNext() &#123;</span><br><span class="line">		item, err := result.Next()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">		m := <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">			<span class="string">"is_delete"</span>: item.IsDelete,</span><br><span class="line">			<span class="comment">//时间需要通过time转换为可读时间字符串</span></span><br><span class="line">			<span class="string">"timestamp"</span>: time.Unix(item.Timestamp.Seconds, <span class="keyword">int64</span>(item.Timestamp.Nanos)),</span><br><span class="line">			<span class="comment">//修改值的交易ID</span></span><br><span class="line">			<span class="string">"tx_id"</span>: item.TxId,</span><br><span class="line">			<span class="string">"value"</span>: <span class="keyword">string</span>(item.Value),</span><br><span class="line">		&#125;</span><br><span class="line">		data = <span class="built_in">append</span>(data, m)</span><br><span class="line">	&#125;</span><br><span class="line">	resultBytes, _ := json.Marshal(data)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(resultBytes)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例查询响应</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜  peer chaincode query -C channel1 -n cc1 -c '&#123;"Args":["history","a"]&#125;'                          </span><br><span class="line">2018-09-12 10:11:15.863 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 10:11:15.864 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: [&#123;"is_delete":false,"timestamp":"2018-09-12T01:33:09.180084548Z","tx_id":"dec8faf9b693865517a76d3edb02ec01d4de498abdbba7315eeb4157b9cc92ab","value":"valuea"&#125;,&#123;"is_delete":false,"timestamp":"2018-09-12T01:34:55.163499101Z","tx_id":"e41616d9f08fce63d0ee485fbc075c9d92758c377b42cb085412c3a18fe4d5b7","value":"valueXX"&#125;,&#123;"is_delete":true,"timestamp":"2018-09-12T02:11:11.822707793Z","tx_id":"8287fa1d26a3d8d48e8a2eac00f261c7bd2da31bc201d320b682efc448d2380b","value":""&#125;]</span><br><span class="line">2018-09-12 10:11:15.870 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="使用复合键"><a href="#使用复合键" class="headerlink" title="使用复合键"></a>使用复合键</h2><p>使用复合键存取时，关键时复合键本身的获取，实际上是通过固定程序在复合的多个属性和对应key值之间的字符串拼接和分割处理。</p>
+<ul>
+<li>CreateCompositeKey(objectType string,attrs []string):<code>key string,error</code>，根据对象类型和属性生成复合键，实际上是把objectType和attrs列表用<code>\x00</code>开头，然后用空值<code>U+0000</code>拼接成字符串，这些事为什么简单key不能以空值开头的原因。</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode02)</span> <span class="title">createBoard</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">3</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	owner, color, shape := args[<span class="number">0</span>], args[<span class="number">1</span>], args[<span class="number">2</span>]</span><br><span class="line">	<span class="comment">//生成的复合key根据对象类型和属性列表用U+0000拼接成字符串作为key</span></span><br><span class="line">	key, err := stub.CreateCompositeKey(<span class="string">"owner_color"</span>, []<span class="keyword">string</span>&#123;owner, color&#125;)</span><br><span class="line">	<span class="comment">//预期输出U+0000owner_colorU+0000&lt;owner&gt;U+0000colorU+0000</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	board := <span class="built_in">new</span>(Board)</span><br><span class="line">	board.Owner = owner</span><br><span class="line">	board.Color = color</span><br><span class="line">	board.Shape = shape</span><br><span class="line">	boardBytes, _ := json.Marshal(board)</span><br><span class="line">	err = stub.PutState(key, boardBytes)</span><br><span class="line">	<span class="keyword">return</span> shim.Success([]<span class="keyword">byte</span>(key))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用合约产生的可以检查产生和复合键值</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["create","mark","red","square"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-12 17:20:50.651 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Get chain(channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-12 17:20:50.656 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default escc</span><br><span class="line">2018-09-12 17:20:50.657 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 003 Using default vscc</span><br><span class="line">2018-09-12 17:20:50.664 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 004 Chaincode invoke successful. result: status:200 payload:"\000owner_color\000mark\000red\000" </span><br><span class="line">2018-09-12 17:20:50.664 CST [main] main -&gt; INFO 005 Exiting.....</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>SplitCompositeKey(key string):<code>(objectType string,attrs []string,error)</code>，将复合键切割，返回对象类型和属性列表，实际上是把objectType和attrs列表用<code>\x00</code>切割字符串</p>
+</li>
+<li><p>GetStateByPartialCompositeKey(objectType string,partialAttrs []string):<code>StateQueryIteratorInterface,error</code>，按复合键的部分属性查询。实际以这部分属性生成一个临时复合键，用作<strong>前缀匹配</strong>，获取所有匹配到的键值对，<strong>不支持其他方式的匹配，如果要实现，需要启用couchdb，进行复杂查询</strong>。</p>
+<blockquote>
+<p>实际上转换为GetStateByRange查询，起始为临时复合键，终止为临时复合键+U+10FFFF</p>
+</blockquote>
+<p>假设有[“mark”,”red”,”square”]和[“mark”,”green”,”star”]两组数据，二者复合键不同，按mark这个owner单一属性做前缀查询后，可以获取到他的所有数据。</p>
+</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode02)</span> <span class="title">getByOwner</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	owner := args[<span class="number">0</span>]</span><br><span class="line">	<span class="comment">//按对象类型和部分属性生成临时复合键，做前缀查询</span></span><br><span class="line">	result, err := stub.GetStateByPartialCompositeKey(<span class="string">"owner_color"</span>, []<span class="keyword">string</span>&#123;owner&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> result.Close()</span><br><span class="line">	boards := <span class="built_in">make</span>([]<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;, <span class="number">0</span>)</span><br><span class="line">	<span class="keyword">for</span> result.HasNext() &#123;</span><br><span class="line">		item, err := result.Next()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">		key := item.Key</span><br><span class="line">		<span class="comment">//分割后的复合键，可以按属性顺序读取</span></span><br><span class="line">		objectType, args, err := stub.SplitCompositeKey(key)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">		value := item.Value</span><br><span class="line">		board := <span class="built_in">new</span>(Board)</span><br><span class="line">		json.Unmarshal(value, board)</span><br><span class="line">		data := <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">			<span class="string">"object_type"</span>: objectType,</span><br><span class="line">			<span class="string">"owner"</span>:       args[<span class="number">0</span>],</span><br><span class="line">			<span class="string">"color"</span>:       args[<span class="number">1</span>],</span><br><span class="line">			<span class="string">"shape"</span>:       board.Shape,</span><br><span class="line">		&#125;</span><br><span class="line">		boards = <span class="built_in">append</span>(boards, data)</span><br><span class="line">	&#125;</span><br><span class="line">	boardsBytes, _ := json.Marshal(boards)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(boardsBytes)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用结果</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">前缀查询能正常产生结果</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["getByOwner","mark"]&#125;'                                       </span><br><span class="line">2018-09-12 17:29:12.190 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 17:29:12.190 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: [&#123;"color":"green","object_type":"owner_color","owner":"mark","shape":"star"&#125;,&#123;"color":"red","object_type":"owner_color","owner":"mark","shape":"square"&#125;]</span><br><span class="line">2018-09-12 17:29:12.196 CST [main] main -&gt; INFO 003 Exiting.....</span><br><span class="line"><span class="meta">#</span><span class="bash">无法按后缀做查询</span></span><br><span class="line">➜ peer chaincode query -C channel1 -n cc -c '&#123;"Args":["getByOwner","red"]&#125;' </span><br><span class="line">2018-09-12 17:31:50.349 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 17:31:50.349 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: []</span><br><span class="line">2018-09-12 17:31:50.354 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="链式调用其他合约"><a href="#链式调用其他合约" class="headerlink" title="链式调用其他合约"></a>链式调用其他合约</h2><ul>
+<li><p>InvokeChaincode(chaincodeName string, args <code>[][]byte</code>, channel string) <code>pb.Response</code>：以当前身份调用其他智能合约。如果channel为空值，则在当前通道上调用合约。</p>
+<p>在<strong>当前交易中</strong>调用其他合约，</p>
+<p>以query方式调用时，无论被调用合约是否在同一个通道，无论被调用合约是否包含<code>PutState</code>的操作，都可以正常返回响应，但不会记入账本产生区块。</p>
+<p>以invoke方式调用时，</p>
+<p><strong>被调用合约处于同一通道</strong>时，当前合约把产生的读写集放到当前交易的读写集中，提交到账本上。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">调用同一通道的合约，被调用合约生成的读写集，存储到区块中</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc1 -c  '&#123;"Args":["callCode","channel1","example02","invoke","a","b","10"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-12 11:19:12.191 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Get chain(channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-12 11:19:12.195 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default escc</span><br><span class="line">2018-09-12 11:19:12.195 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 003 Using default vscc</span><br><span class="line">2018-09-12 11:19:12.211 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 004 Chaincode invoke successful. result: status:200 payload:"&#123;\"message\":\"\",\"payload\":\"\"&#125;" </span><br><span class="line">2018-09-12 11:19:12.211 CST [main] main -&gt; INFO 005 Exiting.....</span><br><span class="line"><span class="meta">#</span><span class="bash">被调用合约中的数据可以检查到变化</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n example02 -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line">2018-09-12 11:19:15.552 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 11:19:15.552 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: 80</span><br><span class="line">2018-09-12 11:19:15.557 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+<p> 如果<strong>被调用合约即为当前通道上的合约自己</strong>，可以正常响应产生结果集，但不会被记入账本。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">合约自己调用自己，可以正常响应</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc1 -c  '&#123;"Args":["callCode","channel1","cc1","put","a","cc1a"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-12 11:42:18.452 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Get chain(channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-12 11:42:18.456 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default escc</span><br><span class="line">2018-09-12 11:42:18.456 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 003 Using default vscc</span><br><span class="line">2018-09-12 11:42:18.466 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 004 Chaincode invoke successful. result: status:200 payload:"&#123;\"message\":\"\",\"payload\":\"\"&#125;" </span><br><span class="line">2018-09-12 11:42:18.466 CST [main] main -&gt; INFO 005 Exiting.....</span><br><span class="line"><span class="meta">#</span><span class="bash">实际并未记入账本，读取不到数据</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc1 -c '&#123;"Args":["get","a"]&#125;'</span><br><span class="line">2018-09-12 11:42:53.689 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 11:42:53.689 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: </span><br><span class="line">2018-09-12 11:42:53.694 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+<p><strong>被调用合约处于不同通道上</strong>时，被调用合约不产生读写集也不记入账本，只产生正常响应，当前合约生成的读写集才会计入到账本上。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">调用另一个通道上的合约，正常产生响应</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc1 -c  '&#123;"Args":["callCode","channel2","example02","invoke","a","b","10"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-12 11:19:12.191 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Get chain(channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-12 11:19:12.195 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default escc</span><br><span class="line">2018-09-12 11:19:12.195 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 003 Using default vscc</span><br><span class="line">2018-09-12 11:19:12.211 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 004 Chaincode invoke successful. result: status:200 payload:"&#123;\"message\":\"\",\"payload\":\"\"&#125;" </span><br><span class="line">2018-09-12 11:19:12.211 CST [main] main -&gt; INFO 005 Exiting.....</span><br><span class="line"><span class="meta">#</span><span class="bash">另一个合约上的数据不会产生变化</span></span><br><span class="line">➜  peer chaincode query -C channel2 -n example02 -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line">2018-09-12 11:26:14.971 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-12 11:26:14.971 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: 100</span><br><span class="line">2018-09-12 11:26:14.975 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="自定义事件内容"><a href="#自定义事件内容" class="headerlink" title="自定义事件内容"></a>自定义事件内容</h2><ul>
+<li>SetEvent(name string,payload []byte)：自定义设置事件内容，client最终可以通过eventhub获取到。</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode01)</span> <span class="title">sendEvent</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	stub.SetEvent(<span class="string">"testEvent"</span>, []<span class="keyword">byte</span>(<span class="string">"this is a test event"</span>))</span><br><span class="line">	<span class="keyword">return</span> shim.Success(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过invoke调用后，监听区块事件，可读取到消息内容，如下图所示：</p>
+<p><img src="/post/6cc685c6/custom_events_content.png" alt="自定义事件内容"></p>
+<h2 id="rich-query"><a href="#rich-query" class="headerlink" title="rich query"></a>rich query</h2><p>GetQueryResult(query string):<code>StateQueryIteratorInterface,error</code></p>
+<p>按值做富查询，peer必须使用couchdb作为状态数据库。查询语句不符合语法时，产生错误</p>
+<ul>
+<li>合约代码目录下<code>META-INF/statedb/couchdb/indexes</code>必须包含合约所使用的索引定义文件</li>
+<li>索引按<a href="http://docs.couchdb.org/en/2.1.1/api/database/find.html#db-index" target="_blank" rel="noopener">couchdb规范</a>，以<em>.json方式存放索引定义。*</em>fabric在部署合约时，会自动创建索引。这也是为什么peer访问couchdb时，需要使用管理员的用户名密码的原因**</li>
+<li><strong>如果不定义索引，也可以使用查询，只是效率可能会低一些</strong></li>
+</ul>
+<p>示例索引定义</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"index"</span>:&#123;<span class="attr">"fields"</span>:[<span class="string">"docType"</span>,<span class="string">"owner"</span>]&#125;,<span class="attr">"ddoc"</span>:<span class="string">"indexOwnerDoc"</span>, <span class="attr">"name"</span>:<span class="string">"indexOwner"</span>,<span class="attr">"type"</span>:<span class="string">"json"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>预先构建下面一组数据</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">"mark","red","star"</span><br><span class="line">"mark","blue","star"</span><br><span class="line">"juli","red","star"</span><br><span class="line">"juli","blue","star"</span><br><span class="line"><span class="meta">#</span><span class="bash">使用合约的创建功能</span></span><br><span class="line">peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["create","mark","green","star"]&#125;' --tls --cafile $ORDERER_CA</span><br></pre></td></tr></table></figure>
+
+<p>示例查询智能合约</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode03)</span> <span class="title">getByQuery</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	queryString := args[<span class="number">0</span>]</span><br><span class="line">    <span class="comment">//按owner查询时，查询语句queryString := fmt.Sprintf("&#123;\"selector\":&#123;\"docType\":\"%s\",\"owner\":\"%s\"&#125;&#125;", docType, owner)</span></span><br><span class="line">	result, err := stub.GetQueryResult(queryString)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> result.Close()</span><br><span class="line">	boards := <span class="built_in">make</span>([]*Board, <span class="number">0</span>)</span><br><span class="line">	<span class="keyword">for</span> result.HasNext() &#123;</span><br><span class="line">		item, err := result.Next()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">		value := item.Value</span><br><span class="line">		board := <span class="built_in">new</span>(Board)</span><br><span class="line">		json.Unmarshal(value, board)</span><br><span class="line">		boards = <span class="built_in">append</span>(boards, board)</span><br><span class="line">	&#125;</span><br><span class="line">	boardsBytes, _ := json.Marshal(boards)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(boardsBytes)</span><br><span class="line">	<span class="keyword">return</span> shim.Success(boardsBytes)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例响应</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">使用索引按owner查询</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["getByQuery","&#123;\"selector\":&#123;\"docType\":\"board\",\"owner\":\"mark\"&#125;&#125;"]&#125;'</span><br><span class="line">2018-09-13 11:10:39.079 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-13 11:10:39.079 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: [&#123;"docType":"board","owner":"mark","color":"blue","shape":"star"&#125;,&#123;"docType":"board","owner":"mark","color":"green","shape":"star"&#125;,&#123;"docType":"board","owner":"mark","color":"red","shape":"star"&#125;]</span><br><span class="line">2018-09-13 11:10:39.096 CST [main] main -&gt; INFO 003 Exiting.....</span><br><span class="line"><span class="meta">#</span><span class="bash">不使用索引，按color查询，也可以正常产生结果</span></span><br><span class="line">➜  demo git:(master) peer chaincode query -C channel1 -n cc -c '&#123;"Args":["getByQuery","&#123;\"selector\":&#123;\"color\":\"red\"&#125;&#125;"]&#125;' </span><br><span class="line">2018-09-13 11:11:34.044 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 001 Using default escc</span><br><span class="line">2018-09-13 11:11:34.044 CST [chaincodeCmd] checkChaincodeCmdParams -&gt; INFO 002 Using default vscc</span><br><span class="line">Query Result: [&#123;"docType":"board","owner":"juli","color":"red","shape":"star"&#125;,&#123;"docType":"board","owner":"mark","color":"red","shape":"star"&#125;]</span><br><span class="line">2018-09-13 11:11:34.058 CST [main] main -&gt; INFO 003 Exiting.....</span><br></pre></td></tr></table></figure>
+
+<h2 id="private-data-collection"><a href="#private-data-collection" class="headerlink" title="private data collection"></a>private data collection</h2><p>private data collection是1.2版本的新增功能，用于在通道中再进行更细粒度的数据隔离。本质上是通过旁路数据库实现的，其结构类似下图所示：</p>
+<p><img src="/post/6cc685c6/1536820637941.png" alt="1536820637941"></p>
+<ul>
+<li>授权节点通过gossip协议相互传播，将私有数据保存在节点本地的旁路数据库中</li>
+<li>未授权节点无法获取私有数据的值，只能存放私有数据的哈希值，用做背书、排序、记账等等。<strong>orderer服务也不会看到私有数据的值</strong>。</li>
+<li>所有节点，无论授权或者未被授权，都可以保存一份key，value的hash后的键值对</li>
+</ul>
+<h3 id="private-data数据流"><a href="#private-data数据流" class="headerlink" title="private data数据流"></a>private data数据流</h3><p>相对与公开的数据交易流程，private data额外增加了一些步骤</p>
+<ul>
+<li>发送invoke给背书节点（此节点需要能够访问指定的集合），private data放在请求提案的transient field中</li>
+<li>背书节点模拟交易，将private data存储到本地的transient data store中（临时本地存储），通过goosip协议，根据collection policy策略，向其他被授权的节点广播数据，相应peer也存储到本地的transient data store中</li>
+<li>背书节点返回public data给客户端，同时private data的key，value的hash，客户端不会收到私有数据</li>
+<li>Orderer根据private data的hash后的值进行排序，分割区块</li>
+<li>Peer验证时，<strong>统一（包括被授权的节点）</strong>使用hash后的private data进行验证</li>
+<li>Commit期间，检查自己时候有权限拿到private data，先检查transient data store，如果没有的话就从其他peer那里pull。验证提交后，将private data存储到私有数据库中，并从transient store中移除对应key的private data。</li>
+</ul>
+<h3 id="相关接口说明"><a href="#相关接口说明" class="headerlink" title="相关接口说明"></a>相关接口说明</h3><p>对应上述接口，private data collections提供了一系列用于操作私有数据的接口。</p>
+<blockquote>
+<p><strong>不支持对私有数据的key做history查询</strong></p>
+<p><strong>存储私有数据时，key相同而collection不同是两份不同的数据</strong></p>
+</blockquote>
+<p>示例集合配置文件</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"collection1"</span>,</span><br><span class="line">    <span class="attr">"policy"</span>: <span class="string">"OR('org1.member')"</span>,</span><br><span class="line">    <span class="attr">"requiredPeerCount"</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">"maxPeerCount"</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="attr">"blockToLive"</span>: <span class="number">1000000</span></span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"collection2"</span>,</span><br><span class="line">    <span class="attr">"policy"</span>: <span class="string">"OR('org2.member')"</span>,</span><br><span class="line">    <span class="attr">"requiredPeerCount"</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">"maxPeerCount"</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="attr">"blockToLive"</span>: <span class="number">3</span></span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>集合collection1只允许org1访问，集合collection2只允许org2访问。</p>
+<ul>
+<li>GetPrivateData(collection, key string)<code>([]byte, error)</code>。读取未被授权的集合数据时，如果对应key不存在，不会产生异常。如果存在则会产生异常，无权访问数据。</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode04)</span> <span class="title">get</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	collection, key := args[<span class="number">0</span>], args[<span class="number">1</span>]</span><br><span class="line">	value, err := stub.GetPrivateData(collection, key)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> shim.Success(value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例调用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">已组织org1身份读取授权访问的collection1的key，可以正常读取</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection1","collectiona"]&#125;'</span><br><span class="line">a</span><br><span class="line"><span class="meta">#</span><span class="bash">已组织org1身份读取未授权访问的collection2的key，key不存在，不产生异常</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectiona"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">已组织org1身份读取未授权访问的collection2的key，key存在，产生异常</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb"]&#125;'</span><br><span class="line">Error: endorsement failure during query. response: status:500 message:"GET_STATE failed: transaction ID: 80d41259308bc228a3c81e030d87b33f0bf581979622ac149313e45124a79ddc: Private data matching public hash version is not available. Public hash version = &amp;version.Height&#123;BlockNum:0x6, TxNum:0x0&#125;, Private data version = (*version.Height)(nil)"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>PutPrivateData(collection string, key string, value []byte) <code>error</code>。集合不存在时，产生异常。<strong>对当前身份无权访问的集合，向其中放入数据可以正常放入，但无法读取</strong>。</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode04)</span> <span class="title">put</span><span class="params">(stub shim.ChaincodeStubInterface, args []<span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">3</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	collection, key, value := args[<span class="number">0</span>], args[<span class="number">1</span>], args[<span class="number">2</span>]</span><br><span class="line">	err := stub.PutPrivateData(collection, key, []<span class="keyword">byte</span>(value))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> shim.Success(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例调用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">以org1身份向被授权的collection1中放入数据，正常放入</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["put","collection1","collectiona","a"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:00:51.456 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:00:51.520 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200</span><br><span class="line"><span class="meta">#</span><span class="bash">以org1身份向未被授权的collection2中放入数据，放入过程不产生异常</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["put","collection2","collectionb","b"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:01:02.180 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:01:02.278 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200</span><br><span class="line"><span class="meta">#</span><span class="bash">以组织org1身份读取未授权访问的collection2的key，key存在，产生异常</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb"]&#125;'</span><br><span class="line">Error: endorsement failure during query. response: status:500 message:"GET_STATE failed: transaction ID: 80d41259308bc228a3c81e030d87b33f0bf581979622ac149313e45124a79ddc: Private data matching public hash version is not available. Public hash version = &amp;version.Height&#123;BlockNum:0x6, TxNum:0x0&#125;, Private data version = (*version.Height)(nil)" </span><br><span class="line"><span class="meta">#</span><span class="bash">以组织org2身份读取授权访问的collection2的org1组织放入的key，可以正常读取出明文</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb"]&#125;'</span><br><span class="line">b</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>DelPrivateData(collection, key string) <code>error</code>：从集合中删除key，无论当前组织是否被授权，都可以正常删除。</li>
+</ul>
+<p>示例智能合约函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(code *ExampleChainCode04)</span> <span class="title">delete</span><span class="params">(stub shim.ChaincodeStubInterface, args [] <span class="keyword">string</span>)</span> <span class="title">pb</span>.<span class="title">Response</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(<span class="string">"not enough args"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	collection, key := args[<span class="number">0</span>], args[<span class="number">1</span>]</span><br><span class="line">	err := stub.DelPrivateData(collection, key)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> shim.Error(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> shim.Success(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例调用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">以org2身份向授权访问的集合collection2中放入键值对</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["put","collection2","collectionb","b"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:19:14.577 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:19:14.880 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200</span><br><span class="line"><span class="meta">#</span><span class="bash">以org2身份向授权访问的集合collection2中读取key，可正常读取</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb","b"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:20:00.498 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:20:00.509 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200 payload:"b"</span><br><span class="line"><span class="meta">#</span><span class="bash">以组织org1身份读取未授权访问的collection2的key，key存在，产生异常</span></span><br><span class="line">➜  peer chaincode query -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb"]&#125;'</span><br><span class="line">Error: endorsement failure during query. response: status:500 message:"GET_STATE failed: transaction ID: 80d41259308bc228a3c81e030d87b33f0bf581979622ac149313e45124a79ddc: Private data matching public hash version is not available. Public hash version = &amp;version.Height&#123;BlockNum:0x6, TxNum:0x0&#125;, Private data version = (*version.Height)(nil)"</span><br><span class="line"><span class="meta">#</span><span class="bash">以组织org1身份删除未授权访问的collection2的key，正常删除</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["delete","collection2","collectionb","b"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:20:24.635 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:20:24.729 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200</span><br><span class="line"><span class="meta">#</span><span class="bash">以org2身份向授权访问的集合collection2中读取key，已经读取不到了</span></span><br><span class="line">➜  peer chaincode invoke -C channel1 -n cc -c '&#123;"Args":["get","collection2","collectionb","b"]&#125;' --tls --cafile $ORDERER_CA</span><br><span class="line">2018-09-13 17:20:38.078 CST [chaincodeCmd] InitCmdFactory -&gt; INFO 001 Retrieved channel (channel1) orderer endpoint: orderer0.demo.com:7050</span><br><span class="line">2018-09-13 17:20:38.086 CST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 002 Chaincode invoke successful. result: status:200</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>GetPrivateDataByRange(collection, startKey, endKey string) <code>(StateQueryIteratorInterface, error)</code>。类似不使用私有数据的对应方法，只是只能在可授权访问的集合中查询值</li>
+<li>GetPrivateDataByPartialCompositeKey(collection, objectType string, keys []string)<code>(StateQueryIteratorInterface, error)</code>。类似不使用私有数据的对应方法，只是只能在可授权访问的集合中查询值</li>
+<li>GetPrivateDataQueryResult(collection, query string) <code>(StateQueryIteratorInterface, error)</code>。类似不使用私有数据的对应方法，只是只能在可授权访问的集合中查询值</li>
+</ul>
+<h2 id="交易信息获取"><a href="#交易信息获取" class="headerlink" title="交易信息获取"></a>交易信息获取</h2><ul>
+<li><code>GetTxID() string</code>：获取交易ID</li>
+<li><code>GetTxTimestamp() (*timestamp.Timestamp, error)</code>：获取交易时间戳，基于UTC时间</li>
+<li><code>GetChannelID() string</code>：执行合约的通道</li>
+<li><code>GetTransient() (map[string][]byte, error)</code>：进行交易过程中，使用的瞬态参数键值对</li>
+<li><code>GetBinding() ([]byte, error)</code>：获取交易的绑定信息，类似瞬态参数，用于规避重放攻击</li>
+<li><code>GetSignedProposal() (*pb.SignedProposal, error)</code>：获取被签名的交易对象，可以从中获取到交易的签名和背书签名等信息</li>
+</ul>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p>智能合约示例代码</p>
+<p><a href="https://github.com/swordboy/fabric_examples/tree/master/cc_example" target="_blank" rel="noopener">https://github.com/swordboy/fabric_examples/tree/master/cc_example</a></p>
+<p>社区private data设计文档</p>
+<p><a href="https://hyperledger-fabric.readthedocs.io/en/release-1.2/private-data-arch.html" target="_blank" rel="noopener">https://hyperledger-fabric.readthedocs.io/en/release-1.2/private-data-arch.html</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/6cc685c6.html">智能合约开发指南</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2018-12-30, 15:30:16</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/6cc685c6.html" title="智能合约开发指南">https://mrfengjian.github.io/post/6cc685c6.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/6cc685c6.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/3760b86f.html">
+                    账本数据结构介绍
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/24f83bc7.html">
+                    一步一步搭建kafka共识的fabric环境
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#最简合约"><span class="toc-number">1.</span> <span class="toc-text">最简合约</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#智能合约接口"><span class="toc-number">2.</span> <span class="toc-text">智能合约接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#请求参数获取"><span class="toc-number">2.1.</span> <span class="toc-text">请求参数获取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#提取调用者身份"><span class="toc-number">2.2.</span> <span class="toc-text">提取调用者身份</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#存取数据"><span class="toc-number">2.3.</span> <span class="toc-text">存取数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用复合键"><span class="toc-number">2.4.</span> <span class="toc-text">使用复合键</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#链式调用其他合约"><span class="toc-number">2.5.</span> <span class="toc-text">链式调用其他合约</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义事件内容"><span class="toc-number">2.6.</span> <span class="toc-text">自定义事件内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rich-query"><span class="toc-number">2.7.</span> <span class="toc-text">rich query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#private-data-collection"><span class="toc-number">2.8.</span> <span class="toc-text">private data collection</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#private-data数据流"><span class="toc-number">2.8.1.</span> <span class="toc-text">private data数据流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关接口说明"><span class="toc-number">2.8.2.</span> <span class="toc-text">相关接口说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#交易信息获取"><span class="toc-number">2.9.</span> <span class="toc-text">交易信息获取</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考链接"><span class="toc-number">3.</span> <span class="toc-text">参考链接</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"智能合约开发指南　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/3760b86f.html" title="上一篇: 账本数据结构介绍">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/24f83bc7.html" title="下一篇: 一步一步搭建kafka共识的fabric环境">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

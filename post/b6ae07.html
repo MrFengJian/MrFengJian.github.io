@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="由于electron从3.x版本开始，已经不再支持直接预览PDF。对有业务需求的场景，总结记录两种实现预览的解决办法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在electron中实现PDF预览功能">
+<meta property="og:url" content="https://mrfengjian.github.io/post/b6ae07.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="由于electron从3.x版本开始，已经不再支持直接预览PDF。对有业务需求的场景，总结记录两种实现预览的解决办法">
+<meta property="og:image" content="https://mrfengjian.github.io/post/b6ae07/image-20200807175117350.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/b6ae07/image-20200807175232223.png">
+<meta property="article:published_time" content="2020-08-07T09:38:30.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.656Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="electron">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/b6ae07/image-20200807175117350.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>在electron中实现PDF预览功能 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-electron-pdf-preview" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/b6ae07.html" class="article-date">
+      <time datetime="2020-08-07T09:38:30.000Z" itemprop="datePublished">2020-08-07</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在electron中实现PDF预览功能
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>由于electron从3.x版本开始，已经不再支持直接预览PDF。有业务需求时，需要自行实现，总结记录两种实现预览的解决办法</p>
+<h1 id="使用iframe预览"><a href="#使用iframe预览" class="headerlink" title="使用iframe预览"></a>使用iframe预览</h1><p>如果PDF文件可以已经托管为静态文件，可以通过iframe的方式，直接使用弹出的页面预览文件内容</p>
+<ul>
+<li><p>优点：实现简单方便，并且自带基本的工具按钮。</p>
+</li>
+<li><p>缺点：样式与应用本身差别比较大，很难定制。</p>
+</li>
+</ul>
+<p>实现代码如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style&#x3D;&quot;margin: 0px&quot;&gt;</span><br><span class="line">                        &lt;iframe :src&#x3D;&quot;fileUrl&quot; style&#x3D;&quot;width: 100%;height:600px&quot;&gt;&lt;&#x2F;iframe&gt;</span><br><span class="line">                    &lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在主进程生成窗口时，打开插件支持，否则无法成功预览，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mainWindow = <span class="keyword">new</span> BrowserWindow(&#123;</span><br><span class="line">    icon: <span class="string">'./static/icon.png'</span>,</span><br><span class="line">    height: <span class="number">563</span>,</span><br><span class="line">    useContentSize: <span class="literal">true</span>,</span><br><span class="line">    width: <span class="number">1000</span>,</span><br><span class="line">    webPreferences: &#123;</span><br><span class="line">      webSecurity: <span class="literal">false</span>,</span><br><span class="line">      javascript: <span class="literal">true</span>,</span><br><span class="line">      plugins: <span class="literal">true</span>&#125;</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>预览效果如下图所示：</p>
+<p><img src="/post/b6ae07/image-20200807175117350.png" alt="image-20200807175117350"></p>
+<h1 id="使用pdfjs-dist"><a href="#使用pdfjs-dist" class="headerlink" title="使用pdfjs-dist"></a>使用pdfjs-dist</h1><p><code>pdfjs</code>是<code>Mozilla</code>开源的PDF处理库，将PDF内容渲染为canvas数据，支持预览、翻页、打印等功能。</p>
+<ul>
+<li><p>优点：样式和功能都可以深度定制，集成度很好。</p>
+</li>
+<li><p>缺点：需要一定工作量来开发定制。</p>
+</li>
+</ul>
+<p>在<code>electron</code>中使用时，如果直接使用<code>pdfjs</code>发布包，会引入较多无用依赖，导致打包生成的应用过大。因此使用<code>pdfjs-dist</code>这个包使用精简实现。</p>
+<p>使用下列命令安装依赖：</p>
+<p><code>cnpm install pdfjs-dist</code></p>
+<p>创建如下内容的组件<code>pdf.vue</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div v-loading&#x3D;&quot;loading&quot; v-if&#x3D;&quot;url&quot; class&#x3D;&quot;center&quot; style&#x3D;&quot;height:100%&quot;&gt;</span><br><span class="line">        &lt;canvas v-for&#x3D;&quot;data in canvasData&quot; :key&#x3D;&quot;data&quot; :id&#x3D;&quot;&#39;the-canvas-&#39;+data&quot; class&#x3D;&quot;canvasstyle&quot;&gt;&lt;&#x2F;canvas&gt;</span><br><span class="line">    &lt;&#x2F;div&gt;</span><br><span class="line">    &lt;div v-else style&#x3D;&quot;font-size:18px;text-align:center;font-weight:900&quot;&gt;</span><br><span class="line">        没有PDF文件可以预览</span><br><span class="line">    &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script type&#x3D;&quot;text&#x2F;ecmascript-6&quot;&gt;</span><br><span class="line">    import PDFJS from &#39;pdfjs-dist&#39;</span><br><span class="line"></span><br><span class="line">    export default &#123;</span><br><span class="line">      name: &#39;PDFContent&#39;,</span><br><span class="line">      props: &#123;</span><br><span class="line">        url: &#123;</span><br><span class="line">          type: String,</span><br><span class="line">          default: &#39;&#39;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      data () &#123;</span><br><span class="line">        return &#123;</span><br><span class="line">          pdfDoc: null, &#x2F;&#x2F; pdfjs 生成的对象</span><br><span class="line">          pageNum: 1, &#x2F;&#x2F;</span><br><span class="line">          pageRendering: false,</span><br><span class="line">          pageNumPending: null,</span><br><span class="line">          scale: 1.2, &#x2F;&#x2F; 放大倍数</span><br><span class="line">          page_num: 0, &#x2F;&#x2F; 当前页数</span><br><span class="line">          page_count: 0, &#x2F;&#x2F; 总页数</span><br><span class="line">          maxscale: 2, &#x2F;&#x2F; 最大放大倍数</span><br><span class="line">          minscale: 0.8, &#x2F;&#x2F; 最小放大倍数</span><br><span class="line">          canvasData: [],</span><br><span class="line">          loading: false</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      created () &#123;</span><br><span class="line">        console.log(this.url)</span><br><span class="line">      &#125;,</span><br><span class="line">      destroyed () &#123;</span><br><span class="line">        console.log(&#39;destroyed&#39;)</span><br><span class="line">      &#125;,</span><br><span class="line">      methods: &#123;</span><br><span class="line">        renderPage (num) &#123;</span><br><span class="line">          &#x2F;&#x2F; 渲染pdf的每一页</span><br><span class="line">          const vm &#x3D; this</span><br><span class="line">          this.pageRendering &#x3D; true</span><br><span class="line">          const canvas &#x3D; document.getElementById(&#96;the-canvas-$&#123;num&#125;&#96;)</span><br><span class="line">          &#x2F;&#x2F; Using promise to fetch the page</span><br><span class="line">          this.pdfDoc.getPage(num).then((page) &#x3D;&gt; &#123;</span><br><span class="line">            const viewport &#x3D; page.getViewport(&#123;scale: vm.scale&#125;)</span><br><span class="line">            canvas.height &#x3D; viewport.height</span><br><span class="line">            canvas.width &#x3D; viewport.width</span><br><span class="line"></span><br><span class="line">            &#x2F;&#x2F; Render PDF page into canvas context</span><br><span class="line">            const renderContext &#x3D; &#123;</span><br><span class="line">              &#x2F;&#x2F;   canvasContext: vm.ctx,</span><br><span class="line">              canvasContext: canvas.getContext(&#39;2d&#39;),</span><br><span class="line">              viewport</span><br><span class="line">            &#125;</span><br><span class="line">            const renderTask &#x3D; page.render(renderContext)</span><br><span class="line"></span><br><span class="line">            &#x2F;&#x2F; Wait for rendering to finish</span><br><span class="line">            renderTask.promise.then(() &#x3D;&gt; &#123;</span><br><span class="line">              vm.pageRendering &#x3D; false</span><br><span class="line">              if (vm.pageNumPending !&#x3D;&#x3D; null) &#123;</span><br><span class="line">                &#x2F;&#x2F; New page rendering is pending</span><br><span class="line">                vm.renderPage(vm.pageNumPending)</span><br><span class="line">                vm.pageNumPending &#x3D; null</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line">          vm.page_num &#x3D; vm.pageNum</span><br><span class="line">        &#125;,</span><br><span class="line">        showPdf () &#123;</span><br><span class="line">          const vm &#x3D; this</span><br><span class="line">          this.loading &#x3D; true</span><br><span class="line">          vm.canvasData &#x3D; []</span><br><span class="line">          &#x2F;&#x2F; PDFJS.GlobalWorkerOptions.workerSrc &#x3D; &#39;static&#x2F;pdf&#x2F;pdf.worker.js&#39;</span><br><span class="line">          PDFJS.GlobalWorkerOptions.workerSrc &#x3D; &#39;static&#x2F;pdf&#x2F;pdf.worker.min.js&#39;</span><br><span class="line">          PDFJS.getDocument(vm.url).promise</span><br><span class="line">            .then((pdf) &#x3D;&gt; &#123;</span><br><span class="line">              &#x2F;&#x2F; 初始化pdf内容</span><br><span class="line">              vm.pdfDoc &#x3D; pdf</span><br><span class="line">              vm.page_count &#x3D; vm.pdfDoc.numPages</span><br><span class="line">              for (let i &#x3D; 0; i &lt; vm.page_count; i +&#x3D; 1) &#123;</span><br><span class="line">                vm.canvasData.push(i + 1)</span><br><span class="line">              &#125;</span><br><span class="line">              return pdf</span><br><span class="line">            &#125;)</span><br><span class="line">            .then((pdf) &#x3D;&gt; &#123;</span><br><span class="line">              &#x2F;&#x2F; 初始化pdf</span><br><span class="line">              vm.pdfDoc &#x3D; pdf</span><br><span class="line">              vm.page_count &#x3D; vm.pdfDoc.numPages</span><br><span class="line">              for (let i &#x3D; 0; i &lt; vm.page_count; i +&#x3D; 1) &#123;</span><br><span class="line">                vm.renderPage(i + 1)</span><br><span class="line">              &#125;</span><br><span class="line">              vm.loading &#x3D; false</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      mounted () &#123;</span><br><span class="line">        this.showPdf()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br><span class="line"></span><br><span class="line">&lt;style lang&#x3D;&quot;scss&quot; scoped type&#x3D;&quot;text&#x2F;css&quot;&gt;</span><br><span class="line"></span><br><span class="line">    .center &#123;</span><br><span class="line">        text-align: center;</span><br><span class="line">        height: 100%;</span><br><span class="line">        overflow: auto;</span><br><span class="line">        padding-top: 20px;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;style&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在需要预览的页面中，引用组件，并设置PDF的地址即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;div style&#x3D;&quot;margin: 0px&quot;&gt;</span><br><span class="line">                        &lt;PDFContent :url&#x3D;&quot;fileUrl&quot;&gt;&lt;&#x2F;PDFContent&gt;</span><br><span class="line">                    &lt;&#x2F;div&gt;</span><br><span class="line"></span><br><span class="line">    import PDFContent from &#39;@&#x2F;components&#x2F;printer&#x2F;pdf&#39;</span><br><span class="line"></span><br><span class="line">    const ipcRenderer &#x3D; require(&#39;electron&#39;).ipcRenderer</span><br><span class="line"></span><br><span class="line">    export default &#123;</span><br><span class="line">      components: &#123;PDFContent&#125;,</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>预览效果如下：</p>
+<p><img src="/post/b6ae07/image-20200807175232223.png" alt="image-20200807175232223"></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/b6ae07.html">在electron中实现PDF预览功能</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2020-08-07, 17:38:30</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/b6ae07.html" title="在electron中实现PDF预览功能">https://mrfengjian.github.io/post/b6ae07.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/b6ae07.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/9c6b0310.html">
+                    Go语言Channel编程模式
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/a9cf0f63.html">
+                    electron打包踩坑
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用iframe预览"><span class="toc-number">2.</span> <span class="toc-text">使用iframe预览</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用pdfjs-dist"><span class="toc-number">3.</span> <span class="toc-text">使用pdfjs-dist</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"在electron中实现PDF预览功能　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/9c6b0310.html" title="上一篇: Go语言Channel编程模式">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/a9cf0f63.html" title="下一篇: electron打包踩坑">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

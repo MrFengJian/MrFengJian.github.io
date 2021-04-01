@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="使用fabric-ca生成所有节点证书、tls证书，用于一步一步搭建网络环境，理解fabric-ca的工作机制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fabric-ca生成所有证书搭建fabric环境">
+<meta property="og:url" content="https://mrfengjian.github.io/post/15ebafa6.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="使用fabric-ca生成所有节点证书、tls证书，用于一步一步搭建网络环境，理解fabric-ca的工作机制。">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1525833031472.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1525424458286.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526268834325.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526268934509.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526269478773.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526352826684.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526287832731.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526451004951.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526433100254.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526452053966.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526452493919.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526452543934.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/1526454067561.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/15ebafa6/msp_structure.png">
+<meta property="article:published_time" content="2018-12-08T07:30:16.000Z">
+<meta property="article:modified_time" content="2021-02-09T02:16:15.621Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="fabric">
+<meta property="article:tag" content="fabric-ca">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/15ebafa6/1525833031472.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>fabric-ca生成所有证书搭建fabric环境 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-build_fabric_network_with_fabric_ca" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/15ebafa6.html" class="article-date">
+      <time datetime="2018-12-08T07:30:16.000Z" itemprop="datePublished">2018-12-08</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      fabric-ca生成所有证书搭建fabric环境
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="基于fabric-ca手动搭建fabric网络"><a href="#基于fabric-ca手动搭建fabric网络" class="headerlink" title="基于fabric-ca手动搭建fabric网络"></a>基于fabric-ca手动搭建fabric网络</h1><h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1 简介"></a>1 简介</h1><p>在<a href="./build_fabric_network_step_by_step.md">一步一步搭建hyperledger环境</a>和<a href="./build_fabric_network_with_kafka_orders.md">kafka共识的orderer集群fabric网络环境搭建</a>两个例子中，我们都只使用<code>cryptogen</code>这个命令行工具来生成各个组织的证书和公私钥文件，在实际生产环境中，我们应当为每个组织建立单独的CA服务器，为这个组织提供PKI体系管理，如图所示：。</p>
+<p><img src="/post/15ebafa6/1525833031472.png" alt="1525833031472"></p>
+<ul>
+<li>enrollment certificate：用户身份证书，作为在网络中确认用户身份使用，长期证书。</li>
+<li>transaction certificate：交易证书(目前暂未实现)，每个交易生成的短期证书。</li>
+<li>tls certificate：tls通信使用的证书，节点之间建立https安全连接时使用。长期证书。</li>
+</ul>
+<p>在网络拓扑中，<code>fabric ca</code>的工作方式如下图所示：</p>
+<p><img src="/post/15ebafa6/1525424458286.png" alt="1525424458286"></p>
+<p>fabric ca client、fabric sdk通过REST API与<code>fabric ca</code>交互。大规模情况下，可以用ca形成集群，在集群中存在一个ca根服务器，和若干中间ca服务器，所有ca服务通过haproxy实现负载均衡，共享相同的存储数据库或者LDAP配置。而fabric ca client和fabric sdk都是通过haproxy来与ca集群交互的。</p>
+<h1 id="2-fabric-ca的集成场景"><a href="#2-fabric-ca的集成场景" class="headerlink" title="2 fabric ca的集成场景"></a>2 fabric ca的集成场景</h1><blockquote>
+<p>集成验证环境使用1.1版本进行验证</p>
+</blockquote>
+<h2 id="2-1-使用fabric-ca管理所有证书"><a href="#2-1-使用fabric-ca管理所有证书" class="headerlink" title="2.1 使用fabric-ca管理所有证书"></a>2.1 使用fabric-ca管理所有证书</h2><p>参考官方<a href="https://github.com/hyperledger/fabric-samples/tree/release-1.1/fabric-ca" target="_blank" rel="noopener">fabric-ca集成例子</a>，将所有用户证书、tls证书生成的部分采用手动方式，加深具体操作的理解。</p>
+<blockquote>
+<ul>
+<li>环境有三个组织：ordererOrg、peerOrg1、peerOrg2，分别为orderer和peer的示例组织。</li>
+</ul>
+<p>​       每个peer组织中有两个peer。</p>
+<ul>
+<li>相关yaml和参考脚本参见链接。</li>
+</ul>
+</blockquote>
+<p>使用命令<code>docker-compose -f docker-compose-root-ca.yaml up -d</code>文件，启动各个组织的root ca服务。对应yaml：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">rca-ordererOrg:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">rca-ordererOrg</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-root-ca.sh 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_CN=rca-ordererOrg</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=rca-ordererOrg</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CERTFILE=/data/ordererOrg-ca-cert.pem</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">rca-peerOrg1:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">rca-peerOrg1</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-root-ca.sh 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_CN=rca-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=rca-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CERTFILE=/data/peerOrg1-ca-cert.pem</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">rca-peerOrg2:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">rca-peerOrg2</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-root-ca.sh 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_CN=rca-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=rca-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CERTFILE=/data/peerOrg2-ca-cert.pem</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br></pre></td></tr></table></figure>
+
+<p>待root ca服务运行正常后，使用命令<code>docker-compose -f docker-compose-inter-ca.yaml up -d</code>来启动各组织的中间ca和生成证书用的容器。对应yaml：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">ica-ordererOrg:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">ica-ordererOrg</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-intermediate-ca.sh ordererOrg 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CA_NAME=ica-ordererOrg</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_INTERMEDIATE_TLS_CERTFILES=/data/ordererOrg-ca-cert.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=ica-ordererOrg</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CHAINFILE=/data/ordererOrg-ca-chain.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">PARENT_URL=https://admin:adminpw@rca-ordererOrg:7054</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">ica-peerOrg1:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">ica-peerOrg1</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-intermediate-ca.sh peerOrg1 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CA_NAME=ica-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_INTERMEDIATE_TLS_CERTFILES=/data/peerOrg1-ca-cert.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=ica-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CHAINFILE=/data/peerOrg1-ca-chain.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">PARENT_URL=https://admin:adminpw@rca-peerOrg1:7054</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">ica-peerOrg2:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">ica-peerOrg2</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/start-intermediate-ca.sh peerOrg2 2&gt;&amp;1'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CA_NAME=ica-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_INTERMEDIATE_TLS_CERTFILES=/data/peerOrg2-ca-cert.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_CSR_HOSTS=ica-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CA_SERVER_DEBUG=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">TARGET_CHAINFILE=/data/peerOrg2-ca-chain.pem</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">PARENT_URL=https://admin:adminpw@rca-peerOrg2:7054</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">setup:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">setup</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-tools</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/setup.sh;sleep 99999'</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">FABRIC_CFG_PATH=/etc/hyperledger/fabric</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ica-ordererOrg</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ica-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ica-peerOrg2</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>由于使用两个文件，docker-compose会产生警告，可忽略。</p>
+<p><code>WARNING: Found orphan containers (rca-peerOrg2, rca-ordererOrg, rca-peerOrg1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up</code></p>
+</blockquote>
+<p>在<code>setup</code>容器中，通过<code>fabric-ca-client</code>与中间ca交互，生成各组织的msp证书和tls证书。</p>
+<h3 id="2-1-1-生成orderer组织公私钥"><a href="#2-1-1-生成orderer组织公私钥" class="headerlink" title="2.1.1 生成orderer组织公私钥"></a>2.1.1 生成orderer组织公私钥</h3><p>在<code>setup</code>容器中，执行下列命令，以管理员身份登录到ordererOrg的中间ca服务器。</p>
+<blockquote>
+<p>使用fabric-ca中间根服务器的根证书链作为tls通信证书。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_HOME=<span class="variable">$HOME</span>/cas/ica-ordererOrg</span><br><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_TLS_CERTFILES=/data/ordererOrg-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin:adminpw@ica-ordererOrg:7054</span><br></pre></td></tr></table></figure>
+
+<p>产生如下输出，表示生成成功。</p>
+<p><img src="/post/15ebafa6/1526268834325.png" alt="1526268834325"></p>
+<p>会在目录<code>$HOME/cas/ica-ordererOrg</code>生成下列文件，代表管理员的身份信息。</p>
+<p><img src="/post/15ebafa6/1526268934509.png" alt="1526268934509"></p>
+<ul>
+<li>cacerts：根ca服务器的根证书</li>
+<li>intermediatecerts：中间根服务器<code>ica-ordererOrg</code>的根证书</li>
+<li>keystone：签发给登录用户的证书私钥</li>
+<li>signcerts：签发给登录用户的证书公钥</li>
+</ul>
+<p>1）注册ordererOrg的节点用户和管理员用户。</p>
+<p>使用如下命令，注册orderer节点用户，<strong>用户名与将要启动的容器名、tls公私钥请求的主机名保持一致</strong></p>
+<p><code>fabric-ca-client register -d --id.name orderer --id.secret password --id.type orderer</code></p>
+<p>产生如下输出表示用户注册成功，如果不指定<code>--id.secret</code>参数，则fabric ca会生成随机密码。</p>
+<p><img src="/post/15ebafa6/1526269478773.png" alt="1526269478773"></p>
+<p>使用如下命令，注册ordererOrg的管理员用户。</p>
+<p><code>fabric-ca-client register -d --id.name admin-ordererOrg --id.secret password --id.attrs &quot;admin=true:ecert&quot;</code></p>
+<p>2）生成ordererOrg的普通用户和管理员用户的证书</p>
+<p>使用如下命令，将根证书和中间根证书下载到ordererOrg组织的msp目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export ORG_MSP_DIR=/data/orgs/ordererOrg/msp</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/ordererOrg-ca-chain.pem</span><br><span class="line">fabric-ca-client getcacert -d -u https://ica-ordererOrg:7054 -M $ORG_MSP_DIR</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，为组织准备tls证书和tls中间根证书，用作tls通信使用。</p>
+<blockquote>
+<p>tls所需证书无法自动生成，需要手动复制创建。后面的所有用户操作与此类似。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp -r /data/orgs/ordererOrg/msp/cacerts/ /data/orgs/ordererOrg/msp/tlscacerts</span><br><span class="line">cp -r /data/orgs/ordererOrg/msp/intermediatecerts /data/orgs/ordererOrg/msp/tlsintermediatecerts</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，切换到ordererOrg的管理员用户，并生成对应证书到msp目录。</p>
+<blockquote>
+<p>admincerts目录需要手动生成，复制到组织和admin用户的admincerts目录。后面的所有用户操作与此类似</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/ordererOrg/admin</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/ordererOrg-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin-ordererOrg:password@ica-ordererOrg:7054</span><br><span class="line">cp -r /data/orgs/ordererOrg/admin/msp/signcerts /data/orgs/ordererOrg/msp/admincerts</span><br><span class="line">cp -r /data/orgs/ordererOrg/admin/msp/signcerts /data/orgs/ordererOrg/admin/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+<p>3）生成orderer节点启动需要的tls公私钥</p>
+<p>使用如下命令，生成orderer节点的tls公私钥</p>
+<blockquote>
+<p>注意登录命令，切换为了orderer节点用户。csr.hosts注意填写为orderer容器的容器名称。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /tmp/tls</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/ordererOrg-ca-chain.pem</span><br><span class="line"></span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://orderer:password@ica-ordererOrg:7054 -M /tmp/tls --csr.hosts orderer</span><br><span class="line">mkdir -p /data/orgs/ordererOrg/orderer/tls</span><br><span class="line"></span><br><span class="line">cp /tmp/tls/keystore/* /data/orgs/ordererOrg/orderer/tls/server.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data/orgs/ordererOrg/orderer/tls/server.crt</span><br></pre></td></tr></table></figure>
+
+<p>生成orderer节点用户的msp公私钥，用于启动orderer进程，命令如下所示。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_HOME=/data/orgs/ordererOrg/orderer</span><br><span class="line">fabric-ca-client enroll -d -u https://orderer:password@ica-ordererOrg:7054</span><br><span class="line"></span><br><span class="line">cp -r /data/orgs/ordererOrg/orderer/msp/cacerts/ /data/orgs/ordererOrg/orderer/msp/tlscacerts </span><br><span class="line">cp -r /data/orgs/ordererOrg/orderer/msp/intermediatecerts /data/orgs/ordererOrg/orderer/msp/tlsintermediatecerts</span><br><span class="line"></span><br><span class="line">cp -r /data/orgs/ordererOrg/msp/admincerts /data/orgs/ordererOrg/orderer/msp</span><br></pre></td></tr></table></figure>
+
+
+
+<p>最终，生成的ordererOrg的公私钥目录结构如下图所示：</p>
+<p><img src="/post/15ebafa6/1526352826684.png" alt="1526352826684"></p>
+<h3 id="2-1-2-生成peer组织公私钥"><a href="#2-1-2-生成peer组织公私钥" class="headerlink" title="2.1.2 生成peer组织公私钥"></a>2.1.2 生成peer组织公私钥</h3><h4 id="生成peerOrg1组织公私钥"><a href="#生成peerOrg1组织公私钥" class="headerlink" title="生成peerOrg1组织公私钥"></a>生成peerOrg1组织公私钥</h4><p>在<code>setup</code>容器中，执行下列命令，以管理员身份登录到peerOrg1的中间ca服务器。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_HOME=<span class="variable">$HOME</span>/cas/ica-peerOrg1</span><br><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin:adminpw@ica-peerOrg1:7054</span><br></pre></td></tr></table></figure>
+
+<p>1）注册peerOrg1组织的节点用户、普通用户和管理员用户</p>
+<p>使用下列命令注册两个节点用户，普通用户和组织的管理员用户。</p>
+<blockquote>
+<p>peer节点用户的名称最好与将要启动的容器名称保持一致，便于识别处理。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fabric-ca-client register -d --id.name peer0-peerOrg1 --id.secret password --id.type peer</span><br><span class="line">fabric-ca-client register -d --id.name peer1-peerOrg1 --id.secret password --id.type peer</span><br><span class="line">fabric-ca-client register -d --id.name admin-peerOrg1 --id.secret password --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert"</span><br><span class="line">fabric-ca-client register -d --id.name user-peerOrg1 --id.secret password</span><br></pre></td></tr></table></figure>
+
+<p>2）生成peerOrg1组织的相应公私钥证书和msp目录</p>
+<p>使用如下命令，将根证书和中间根证书下载到peerOrg1的msp目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export ORG_MSP_DIR=/data/orgs/peerOrg1/msp</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">fabric-ca-client getcacert -d -u https://ica-peerOrg1:7054 -M $ORG_MSP_DIR</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，为peerOrg1组织准备tls证书和tls中间根证书，用作tls通信使用。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /data/orgs/peerOrg1/msp/cacerts/ /data/orgs/peerOrg1/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg1/msp/intermediatecerts /data/orgs/peerOrg1/msp/tlsintermediatecerts -r</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，切换到peerOrg1的管理员用户，并生成对应证书到msp目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg1/admin</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin-peerOrg1:password@ica-peerOrg1:7054</span><br><span class="line">cp -r /data/orgs/peerOrg1/admin/msp/signcerts /data/orgs/peerOrg1/msp/admincerts</span><br><span class="line">cp -r /data/orgs/peerOrg1/admin/msp/signcerts /data/orgs/peerOrg1/admin/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+<p>3）生成peerOrg1的节点的公私钥和tls公私钥</p>
+<p>启动peer节点时，需要生成对应的MSP公私钥和tls证书，生成公私钥过程中的节点命令需要与启动的容器名称保持一致。约定peerOrg1的两个节点为peer0-peerOrg1、peer1-peerOrg1。</p>
+<p>使用下列命令，生成peer0-peerOrg1、peer1-peerOrg1节点的tls公私钥和msp目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">使用节点用户peer0-peerOrg1，准备节点的tls服务公私钥</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">mkdir -p /data/orgs/peerOrg1/peer0/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer0-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/orgs/peerOrg1/peer0/tls/server.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data/orgs/peerOrg1/peer0/tls/server.crt</span><br><span class="line"><span class="meta">#</span><span class="bash">节点用户peer0-peerOrg1的msp目录准备</span></span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg1/peer0</span><br><span class="line">fabric-ca-client enroll -d -u https://peer0-peerOrg1:password@ica-peerOrg1:7054</span><br><span class="line">cp /data/orgs/peerOrg1/peer0/msp/cacerts/ /data/orgs/peerOrg1/peer0/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg1/peer0/msp/intermediatecerts /data/orgs/peerOrg1/peer0/msp/tlsintermediatecerts -r</span><br><span class="line"><span class="meta">#</span><span class="bash">peer节点使用管理员用户的证书</span></span><br><span class="line">cp -r /data/orgs/peerOrg1/msp/admincerts /data/orgs/peerOrg1/peer0/msp</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">使用节点用户peer1-peerOrg1，准备节点的tls服务公私钥</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">mkdir -p /data/orgs/peerOrg1/peer1/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer1-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/orgs/peerOrg1/peer1/tls/server.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data/orgs/peerOrg1/peer1/tls/server.crt</span><br><span class="line"><span class="meta">#</span><span class="bash">节点用户peer0-peerOrg1的msp目录准备</span></span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg1/peer1</span><br><span class="line">fabric-ca-client enroll -d -u https://peer1-peerOrg1:password@ica-peerOrg1:7054</span><br><span class="line">cp /data/orgs/peerOrg1/peer1/msp/cacerts/ /data/orgs/peerOrg1/peer1/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg1/peer1/msp/intermediatecerts /data/orgs/peerOrg1/peer1/msp/tlsintermediatecerts -r</span><br><span class="line"><span class="meta">#</span><span class="bash">peer节点使用管理员用户的证书</span></span><br><span class="line">cp -r /data/orgs/peerOrg1/msp/admincerts /data/orgs/peerOrg1/peer1/msp</span><br></pre></td></tr></table></figure>
+
+<p><strong><em>可选）</em></strong>如果peer节点开启了客户端请求的tls验证，使用如下命令生成客户端验证证书和命令行调用的证书。否则可忽略。</p>
+<blockquote>
+<p>两份证书可以使用相同的文件，也可以使用不同的，只要是同一个ca服务签发的就可以</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">mkdir /data/tls -p</span><br><span class="line"></span><br><span class="line"><span class="comment">#生成客户端校验证书</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer0-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer0-peerOrg1-clientauth.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer0-peerOrg1-clientauth.crt</span><br><span class="line"></span><br><span class="line"><span class="comment">#生成命令行使用的证书</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer0-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer0-peerOrg1-cli.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer0-peerOrg1-cli.crt</span><br><span class="line"></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer1-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer1-peerOrg1-clientauth.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer1-peerOrg1-clientauth.crt</span><br><span class="line"></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg1:password@ica-peerOrg1:7054 -M /tmp/tls --csr.hosts peer1-peerOrg1</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer1-peerOrg1-cli.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer1-peerOrg1-cli.crt</span><br></pre></td></tr></table></figure>
+
+<p>4）生成普通用户的公私钥和tls公私钥</p>
+<p>使用如下命令，生成peerOrg1组织中用户user-peerOrg1的公私钥</p>
+<blockquote>
+<p>普通用户使用自己的证书作为管理使用</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg1/user-peerOrg1</span><br><span class="line">fabric-ca-client enroll -d -u https://user-peerOrg1:password@ica-peerOrg1:7054</span><br><span class="line">cp /data/orgs/peerOrg1/user-peerOrg1/msp/cacerts/ /data/orgs/peerOrg1/user-peerOrg1/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg1/user-peerOrg1/msp/intermediatecerts /data/orgs/peerOrg1/user-peerOrg1/msp/tlsintermediatecerts -r</span><br><span class="line">cp -r /data/orgs/peerOrg1/user-peerOrg1/msp/signcerts /data/orgs/peerOrg1/user-peerOrg1/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+<p>最终peerOrg1生成的公私钥目录结构如下图所示：</p>
+<p><img src="/post/15ebafa6/1526287832731.png" alt="1526287832731"></p>
+<h4 id="生成peerOrg2组织公私钥"><a href="#生成peerOrg2组织公私钥" class="headerlink" title="生成peerOrg2组织公私钥"></a>生成peerOrg2组织公私钥</h4><p>peerOrg2的相关操作与之类似，相应命令更改为对应组织名称即可。</p>
+<p>登录中间ca管理员的命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_HOME=<span class="variable">$HOME</span>/cas/ica-peerOrg2</span><br><span class="line"><span class="built_in">export</span> FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin:adminpw@ica-peerOrg2:7054</span><br></pre></td></tr></table></figure>
+
+<p>1）注册peerOrg2组织的节点用户、普通用户和管理员用户的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fabric-ca-client register -d --id.name peer0-peerOrg2 --id.secret password --id.type peer</span><br><span class="line">fabric-ca-client register -d --id.name peer1-peerOrg2 --id.secret password --id.type peer</span><br><span class="line">fabric-ca-client register -d --id.name admin-peerOrg2 --id.secret password --id.attrs <span class="string">"hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert"</span></span><br><span class="line">fabric-ca-client register -d --id.name user-peerOrg2 --id.secret password</span><br></pre></td></tr></table></figure>
+
+<p>2）准备peerOrg2组织公私钥</p>
+<p>使用如下命令，将根证书和中间根证书下载到peerOrg1的msp目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export ORG_MSP_DIR=/data/orgs/peerOrg2/msp</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line">fabric-ca-client getcacert -d -u https://ica-peerOrg2:7054 -M $ORG_MSP_DIR</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，为peerOrg2组织准备tls证书和tls中间根证书，用作tls通信使用。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /data/orgs/peerOrg2/msp/cacerts/ /data/orgs/peerOrg2/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg2/msp/intermediatecerts /data/orgs/peerOrg2/msp/tlsintermediatecerts -r</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令，切换到peerOrg2的管理员用户，并生成对应证书到msp目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg2/admin</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin-peerOrg2:password@ica-peerOrg2:7054</span><br><span class="line">cp -r /data/orgs/peerOrg2/admin/msp/signcerts /data/orgs/peerOrg2/msp/admincerts</span><br><span class="line">cp -r /data/orgs/peerOrg2/admin/msp/signcerts /data/orgs/peerOrg2/admin/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+
+
+<p>3）生成peerOrg2各节点的公私钥命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">使用节点用户peer0-peerOrg2</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">mkdir -p /data/orgs/peerOrg2/peer0/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer0-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/orgs/peerOrg2/peer0/tls/server.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data/orgs/peerOrg2/peer0/tls/server.crt</span><br><span class="line"><span class="meta">#</span><span class="bash">节点用户peer0-peerOrg2的msp目录准备</span></span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg2/peer0</span><br><span class="line">fabric-ca-client enroll -d -u https://peer0-peerOrg2:password@ica-peerOrg2:7054</span><br><span class="line">cp /data/orgs/peerOrg2/peer0/msp/cacerts/ /data/orgs/peerOrg2/peer0/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg2/peer0/msp/intermediatecerts /data/orgs/peerOrg2/peer0/msp/tlsintermediatecerts -r</span><br><span class="line"><span class="meta">#</span><span class="bash">peer节点使用管理员用户的证书</span></span><br><span class="line">cp -r /data/orgs/peerOrg2/msp/admincerts /data/orgs/peerOrg2/peer0/msp</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">使用节点用户peer1-peerOrg2</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">mkdir -p /data/orgs/peerOrg2/peer1/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer1-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/orgs/peerOrg2/peer1/tls/server.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data/orgs/peerOrg2/peer1/tls/server.crt</span><br><span class="line"><span class="meta">#</span><span class="bash">节点用户peer0-peerOrg2的msp目录准备</span></span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg2/peer1</span><br><span class="line">fabric-ca-client enroll -d -u https://peer1-peerOrg2:password@ica-peerOrg2:7054</span><br><span class="line">cp /data/orgs/peerOrg2/peer1/msp/cacerts/ /data/orgs/peerOrg2/peer1/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg2/peer1/msp/intermediatecerts /data/orgs/peerOrg2/peer1/msp/tlsintermediatecerts -r</span><br><span class="line"><span class="meta">#</span><span class="bash">peer节点使用管理员用户的证书</span></span><br><span class="line">cp -r /data/orgs/peerOrg2/msp/admincerts /data/orgs/peerOrg2/peer1/msp</span><br></pre></td></tr></table></figure>
+
+<p>生成peer节点的客户端校验证书和命令行证书命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line">mkdir /data/tls -p</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">peer链接orderer使用的tls公私钥</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer0-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer0-peerOrg2-clientauth.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer0-peerOrg2-clientauth.crt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">命令行连接orderer使用tls公私钥</span></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer0-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer0-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer0-peerOrg2-cli.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer0-peerOrg2-cli.crt</span><br><span class="line"></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer1-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer1-peerOrg2-clientauth.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer1-peerOrg2-clientauth.crt</span><br><span class="line"></span><br><span class="line">rm -rf /tmp/tls</span><br><span class="line">fabric-ca-client enroll -d --enrollment.profile tls -u https://peer1-peerOrg2:password@ica-peerOrg2:7054 -M /tmp/tls --csr.hosts peer1-peerOrg2</span><br><span class="line">cp /tmp/tls/keystore/* /data/tls/peer1-peerOrg2-cli.key</span><br><span class="line">cp /tmp/tls/signcerts/* /data//tls/peer1-peerOrg2-cli.crt</span><br></pre></td></tr></table></figure>
+
+
+
+<p>4）生成peerOrg2普通用户的公私钥命令</p>
+<blockquote>
+<p>普通用户使用自己的证书作为管理使用</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg2/user-peerOrg2</span><br><span class="line">fabric-ca-client enroll -d -u https://user-peerOrg2:password@ica-peerOrg2:7054</span><br><span class="line">cp /data/orgs/peerOrg2/user-peerOrg2/msp/cacerts/ /data/orgs/peerOrg2/user-peerOrg2/msp/tlscacerts -r </span><br><span class="line">cp /data/orgs/peerOrg2/user-peerOrg2/msp/intermediatecerts /data/orgs/peerOrg2/user-peerOrg2/msp/tlsintermediatecerts -r</span><br><span class="line">cp -r /data/orgs/peerOrg2/user-peerOrg2/msp/signcerts /data/orgs/peerOrg2/user-peerOrg2/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-3-生成创世块和channel配置"><a href="#2-1-3-生成创世块和channel配置" class="headerlink" title="2.1.3 生成创世块和channel配置"></a>2.1.3 生成创世块和channel配置</h3><p>完整所有组织和用户的公私钥准备后，就可以按照正常搭建fabric网络环境那样继续进行了。</p>
+<p>使用如下<code>configtx.yaml</code>，创建创世块</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">Profiles:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">OrgsOrdererGenesis:</span></span><br><span class="line">  </span><br><span class="line">    <span class="attr">Orderer:</span></span><br><span class="line">      <span class="attr">OrdererType:</span> <span class="string">solo</span></span><br><span class="line">      </span><br><span class="line">      <span class="attr">Addresses:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">orderer:7050</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">BatchTimeout:</span> <span class="string">2s</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">BatchSize:</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">MaxMessageCount:</span> <span class="number">10</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">AbsoluteMaxBytes:</span> <span class="number">99</span> <span class="string">MB</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">PreferredMaxBytes:</span> <span class="number">512</span> <span class="string">KB</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">Kafka:</span></span><br><span class="line">        <span class="attr">Brokers:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:9092</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">Organizations:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="meta">*ordererOrg</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Consortiums:</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">SampleConsortium:</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">Organizations:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="meta">*peerOrg1</span></span><br><span class="line">          <span class="bullet">-</span> <span class="meta">*peerOrg2</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">OrgsChannel:</span></span><br><span class="line">    <span class="attr">Consortium:</span> <span class="string">SampleConsortium</span></span><br><span class="line">    <span class="attr">Application:</span></span><br><span class="line">      <span class="string">&lt;&lt;:</span> <span class="meta">*ApplicationDefaults</span></span><br><span class="line">      <span class="attr">Organizations:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="meta">*peerOrg1</span></span><br><span class="line">        <span class="bullet">-</span> <span class="meta">*peerOrg2</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Organizations:</span></span><br><span class="line"></span><br><span class="line">  <span class="bullet">-</span> <span class="meta">&amp;ordererOrg</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Name:</span> <span class="string">ordererOrg</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">ID:</span> <span class="string">ordererOrgMSP</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">MSPDir:</span> <span class="string">/data/orgs/ordererOrg/msp</span></span><br><span class="line"></span><br><span class="line">  <span class="bullet">-</span> <span class="meta">&amp;peerOrg1</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Name:</span> <span class="string">peerOrg1</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">ID:</span> <span class="string">peerOrg1MSP</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">MSPDir:</span> <span class="string">/data/orgs/peerOrg1/msp</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">AnchorPeers:</span></span><br><span class="line">       <span class="bullet">-</span> <span class="attr">Host:</span> <span class="string">peer0-peerOrg1</span></span><br><span class="line">         <span class="attr">Port:</span> <span class="number">7051</span></span><br><span class="line"></span><br><span class="line">  <span class="bullet">-</span> <span class="meta">&amp;peerOrg2</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">Name:</span> <span class="string">peerOrg2</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">ID:</span> <span class="string">peerOrg2MSP</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">MSPDir:</span> <span class="string">/data/orgs/peerOrg2/msp</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">AnchorPeers:</span></span><br><span class="line">       <span class="bullet">-</span> <span class="attr">Host:</span> <span class="string">peer0-peerOrg2</span></span><br><span class="line">         <span class="attr">Port:</span> <span class="number">7051</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Application:</span> <span class="meta">&amp;ApplicationDefaults</span></span><br><span class="line">    <span class="attr">Organizations:</span></span><br></pre></td></tr></table></figure>
+
+<p>在<code>setup</code>容器中执行命令，来生成创世块。</p>
+<blockquote>
+<p>默认执行命令时，先从环境变量FABRIC_CFG_PATH指定目录查询，没有时在找当前目录的configtx.yaml文件</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">configtxgen -profile OrgsOrdererGenesis -outputBlock /data/genesis.block</span><br></pre></td></tr></table></figure>
+
+<p>生成channel的配置</p>
+<p><code>configtxgen -profile OrgsChannel -outputCreateChannelTx /data/channel.tx -channelID mychannel</code></p>
+<p>生成组织锚节点配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">configtxgen -profile OrgsChannel -outputAnchorPeersUpdate /data/peerOrg1Anchor.tx -channelID mychannel -asOrg peerOrg1</span><br><span class="line">configtxgen -profile OrgsChannel -outputAnchorPeersUpdate /data/peerOrg2Anchor.tx -channelID mychannel -asOrg peerOrg2</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-1-4-启动fabric网络并进行基本测试"><a href="#2-1-4-启动fabric网络并进行基本测试" class="headerlink" title="2.1.4 启动fabric网络并进行基本测试"></a>2.1.4 启动fabric网络并进行基本测试</h3><p>使用<code>docker-compose-cli.yaml</code>启动fabric网络，内容如下：</p>
+<blockquote>
+<p>由于使用了多个yaml文件，docker-compose会产生如下告警，可忽略：</p>
+<p><code>WARNING: Found orphan containers (setup, ica-peerOrg1, ica-ordererOrg, ica-peerOrg2, rca-ordererOrg, rca-peerOrg1, rca-peerOrg2) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.</code></p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">orderer:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">orderer</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-orderer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LISTENADDRESS=0.0.0.0</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_GENESISMETHOD=file</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_GENESISFILE=/data/genesis.block</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOCALMSPID=ordererOrgMSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOCALMSPDIR=/data/orgs/ordererOrg/orderer/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_PRIVATEKEY=/data/orgs/ordererOrg/orderer/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_CERTIFICATE=/data/orgs/ordererOrg/orderer/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_TLS_ROOTCAS=[/data/ordererOrg-ca-chain.pem]</span></span><br><span class="line">      <span class="comment"># 客户端发送请求需要tls证书验证</span></span><br><span class="line">      <span class="comment">#- ORDERER_GENERAL_TLS_CLIENTAUTHREQUIRED=true</span></span><br><span class="line">      <span class="comment">#- ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/data/ordererOrg-ca-chain.pem]</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_GENERAL_LOGLEVEL=debug</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">orderer</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">peer0-peerOrg1:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">peer0-peerOrg1</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-peer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ID=peer0-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_LOCALMSPID=peerOrg1MSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/peer0/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock</span></span><br><span class="line">      <span class="comment"># 启动chaincode容器的网络</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca_default</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_LOGGING_LEVEL=DEBUG</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="comment"># peer服务自身启动使用的tls证书</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_CERT_FILE=/data/orgs/peerOrg1/peer0/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_KEY_FILE=/data/orgs/peerOrg1/peer0/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span></span><br><span class="line">      <span class="comment"># 客户端请求的tls验证证书</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTAUTHREQUIRED=true</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTROOTCAS_FILES=/data/peerOrg1-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTCERT_FILE=/data/tls/peer0-peerOrg1-clientauth.crt</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTKEY_FILE=/data/tls/peer0-peerOrg1-clientauth.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_USELEADERELECTION=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_ORGLEADER=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0-peerOrg1:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_SKIPHANDSHAKE=true</span></span><br><span class="line">    <span class="attr">working_dir:</span> <span class="string">/opt/gopath/src/github.com/hyperledger/fabric/peer</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">peer</span> <span class="string">node</span> <span class="string">start</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/var/run:/host/var/run</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">peer1-peerOrg1:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">peer1-peerOrg1</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-peer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ID=peer1-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ADDRESS=peer1-peerOrg1:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_LOCALMSPID=peerOrg1MSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/peer1/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca_default</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_LOGGING_LEVEL=DEBUG</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_CERT_FILE=/data/orgs/peerOrg1/peer1/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_KEY_FILE=/data/orgs/peerOrg1/peer1/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTAUTHREQUIRED=true</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTROOTCAS_FILES=/data/peerOrg1-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTCERT_FILE=/data/tls/peer1-peerOrg1-clientauth.crt</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTKEY_FILE=/data/tls/peer1-peerOrg1-clientauth.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_USELEADERELECTION=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_ORGLEADER=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-peerOrg1:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_SKIPHANDSHAKE=true</span></span><br><span class="line">      <span class="comment"># 其他节点先与锚节点建立gossip通道</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_BOOTSTRAP=peer0-peerOrg1:7051</span></span><br><span class="line">    <span class="attr">working_dir:</span> <span class="string">/opt/gopath/src/github.com/hyperledger/fabric/peer</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">peer</span> <span class="string">node</span> <span class="string">start</span></span><br><span class="line">    <span class="comment">#command: sleep 99999</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/var/run:/host/var/run</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">peer0-peerOrg2:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">peer0-peerOrg2</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-peer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ID=peer0-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_LOCALMSPID=peerOrg2MSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/peer0/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca_default</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_LOGGING_LEVEL=DEBUG</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_CERT_FILE=/data/orgs/peerOrg2/peer0/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_KEY_FILE=/data/orgs/peerOrg2/peer0/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTAUTHREQUIRED=true</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTROOTCAS_FILES=/data/peerOrg2-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTCERT_FILE=/data/tls/peer0-peerOrg2-clientauth.crt</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTKEY_FILE=/data/tls/peer0-peerOrg2-clientauth.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_USELEADERELECTION=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_ORGLEADER=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0-peerOrg2:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_SKIPHANDSHAKE=true</span></span><br><span class="line">    <span class="attr">working_dir:</span> <span class="string">/opt/gopath/src/github.com/hyperledger/fabric/peer</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">peer</span> <span class="string">node</span> <span class="string">start</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/var/run:/host/var/run</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">peer1-peerOrg2:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">peer1-peerOrg2</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-peer</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ID=peer1-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_ADDRESS=peer1-peerOrg2:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_LOCALMSPID=peerOrg2MSP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/peer1/msp</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca_default</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_LOGGING_LEVEL=DEBUG</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ENABLED=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_CERT_FILE=/data/orgs/peerOrg2/peer1/tls/server.crt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_KEY_FILE=/data/orgs/peerOrg2/peer1/tls/server.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTAUTHREQUIRED=true</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTROOTCAS_FILES=/data/peerOrg2-ca-chain.pem</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTCERT_FILE=/data/tls/peer1-peerOrg2-clientauth.crt</span></span><br><span class="line">      <span class="comment">#- CORE_PEER_TLS_CLIENTKEY_FILE=/data/tls/peer1-peerOrg2-clientauth.key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_USELEADERELECTION=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_ORGLEADER=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-peerOrg2:7051</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_SKIPHANDSHAKE=true</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CORE_PEER_GOSSIP_BOOTSTRAP=peer0-peerOrg2:7051</span></span><br><span class="line">    <span class="attr">working_dir:</span> <span class="string">/opt/gopath/src/github.com/hyperledger/fabric/peer</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">peer</span> <span class="string">node</span> <span class="string">start</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/var/run:/host/var/run</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">cli:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">cli</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">hyperledger/fabric-ca-tools</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">GOPATH=/opt/gopath</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">/bin/bash</span> <span class="string">-c</span> <span class="string">'/scripts/prepare.sh;sleep 99999'</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./scripts:/scripts</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data:/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./examples:/opt/gopath/src/github.com/</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">orderer</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">peer0-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">peer1-peerOrg1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">peer0-peerOrg2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">peer1-peerOrg2</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="创建channel并加入peer"><a href="#创建channel并加入peer" class="headerlink" title="创建channel并加入peer"></a>创建channel并加入peer</h4><p>使用下面的命令，创建channel，并将所有peer加入到channel中。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">使用peerOrg1或者peerOrg2任意两个组织的管理员身份操作</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg1MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/admin/msp</span><br><span class="line">peer channel create --logging-level=DEBUG -c mychannel -f /data/channel.tx -o orderer:7050 --cafile /data/ordererOrg-ca-chain.pem --tls </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">设置tls通信根证书和要操作的peer节点</span></span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">peer channel join -b mychannel.block</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">设置节点</span></span><br><span class="line">export CORE_PEER_ADDRESS=peer1-peerOrg1:7051</span><br><span class="line">peer channel join -b mychannel.block</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">更新组织锚节点</span></span><br><span class="line">peer channel update -c mychannel -f /data/peerOrg1Anchor.tx -o orderer:7050 --tls --cafile /data/ordererOrg-ca-chain.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">切换到peerOrg2管理员来操作</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg2MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">peer channel join -b mychannel.block</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">设置节点</span></span><br><span class="line">export CORE_PEER_ADDRESS=peer1-peerOrg2:7051</span><br><span class="line">peer channel join -b mychannel.block</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">更新组织锚节点</span></span><br><span class="line">peer channel update -c mychannel -f /data/peerOrg2Anchor.tx -o orderer:7050 --tls --cafile /data/ordererOrg-ca-chain.pem</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果要启用客户端tls验证，在所有命令上增加参数：</p>
+<p>–clientauth –keyfile /data/tls/peer0-peerOrg1-cli.key –certfile /data/tls/peer0-peerOrg1-cli.crt</p>
+<p>cafile：请求orderer使用的中间根证书</p>
+<p>keyfile：peer命令行使用的私钥</p>
+<p>certifle：peer命令行使用的公钥</p>
+</blockquote>
+<h4 id="测试chaincode基本功能"><a href="#测试chaincode基本功能" class="headerlink" title="测试chaincode基本功能"></a>测试chaincode基本功能</h4><p>使用如下命令，在peerOrg1和peerOrg2的第一个peer上上安装和实例化chaincode。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">在peer0-peerOrg1上安装和实例化chaincode</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg1MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line"><span class="meta">#</span><span class="bash">安装chaincode</span></span><br><span class="line">peer chaincode install -n mycc -v 1.0 -p github.com/chaincode/chaincode_example02/go/</span><br><span class="line"><span class="meta">#</span><span class="bash">实例化</span></span><br><span class="line">peer chaincode instantiate -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n mycc -v 1.0 -c '&#123;"Args":["init","a","100","b","200"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">转账</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n mycc -c '&#123;"Args":["invoke","b","a","10"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">分别再查询</span></span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","b"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">在peer0-peerOrg2上安装</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg2MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line"><span class="meta">#</span><span class="bash">每个channel中，同名channel只能安装和实例化一次，无须再执行</span></span><br><span class="line"><span class="meta">#</span><span class="bash">通过peer0-peerOrg2执行chaincode</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n mycc -c '&#123;"Args":["invoke","b","a","10"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">分别再查询</span></span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","b"]&#125;'</span><br></pre></td></tr></table></figure>
+
+
+
+<p>以上yaml可根据参考资料中的相关链接，使用yaml和相应脚本启动环境。手动生成组织公私钥的过程都已经通过脚本自动化了。</p>
+<h2 id="2-2-使用fabric-ca结合用户提供根证书"><a href="#2-2-使用fabric-ca结合用户提供根证书" class="headerlink" title="2.2 使用fabric-ca结合用户提供根证书"></a>2.2 使用fabric-ca结合用户提供根证书</h2><p><strong>目前，根据fabric-ca的官方文档，仅支持ECDSA算法的用户证书。</strong>在这种场景下，fabric-ca作为中间ca服务为各组织提供PKI相关能力。用户需要提供下列文件：</p>
+<ul>
+<li>颁发给fabric-ca的中间根证书、私钥</li>
+<li>办法给fabric-ca服务的根证书链</li>
+<li>（可选），tls证书</li>
+</ul>
+<p>指定的证书目前测试可以有两种方式生成：</p>
+<ol>
+<li><p>搭建一个fabric-ca服务器，使用fabric-ca-client的命令行，为三个组织生成中间ca服务器的证书，将证书分发给对应的中间ca服务器，进行启动。使用的示例命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=/root/ica-org0</span><br><span class="line">fabric-ca-client enroll -u https://rca-org0-admin:rca-org0-adminpw@rca-org0:7054  --tls.certfiles /etc/hyperledger/fabric-ca/tls-cert.pem --enrollment.profile ca</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>借助fabric-ca中的<a href="https://github.com/hyperledger/fabric-ca/blob/release-1.1/scripts/fvt/utils/pki" target="_blank" rel="noopener">pki</a>工具脚本，生成中间ca服务器的证书，然后在进行启动，响应的示例命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">生成ca根证书</span></span><br><span class="line">./pki -f newca -a ca -t ec -l 256 -d sha256 \</span><br><span class="line">                        -n "/C=US/ST=NC/L=RTP/O=IBM/O=Hyperledger/OU=FVT/CN=ca/" \</span><br><span class="line">                        -K "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign,cRLSign" \</span><br><span class="line">                        -E "serverAuth,clientAuth,codeSigning,emailProtection,timeStamping" \</span><br><span class="line">                        -e 20370101000000Z -s 20160101000000Z -p ca-</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">生成org0组织的中间根证书</span></span><br><span class="line">./pki -f newsub -b ica-org0 -a ca -t ec -l 256 -d sha256 \</span><br><span class="line">                        -n "/C=US/ST=NC/L=RTP/O=IBM/O=Hyperledger/OU=FVT/CN=ica-org0/"  \</span><br><span class="line">                        -K "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign,cRLSign" \</span><br><span class="line">                        -E "serverAuth,clientAuth,codeSigning,emailProtection,timeStamping" \</span><br><span class="line">                        -e 20370101000000Z -s 20160101000000Z -p ica-org0-</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">./pki -f newsub -b ica-org1 -a ca -t ec -l 256 -d sha256 \</span><br><span class="line">                        -n "/C=US/ST=NC/L=RTP/O=IBM/O=Hyperledger/OU=FVT/CN=ica-org1/" \</span><br><span class="line">                        -K "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign,cRLSign" \</span><br><span class="line">                        -E "serverAuth,clientAuth,codeSigning,emailProtection,timeStamping" \</span><br><span class="line">                        -e 20370101000000Z -s 20160101000000Z -p ica-org1-</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">./pki -f newsub -b ica-org2 -a ca -t ec -l 256 -d sha256 \</span><br><span class="line">                        -n "/C=US/ST=NC/L=RTP/O=IBM/O=Hyperledger/OU=FVT/CN=ica-org2/" \</span><br><span class="line">                        -K "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign,cRLSign" \</span><br><span class="line">                        -E "serverAuth,clientAuth,codeSigning,emailProtection,timeStamping" \</span><br><span class="line">                        -e 20370101000000Z -s 20160101000000Z -p ica-org2-</span><br></pre></td></tr></table></figure>
+
+<p>然后根据中间根证书的目录结构，创建对应的文件，以生成org0中间ca服务器目录为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ica-org0/msp/&#123;cacerts,intermediatecerts,keystore,signcerts&#125;</span><br><span class="line">cp $HOME/ica-org0-cert.pem ica-org0/ca-cert.pem</span><br><span class="line">cp $HOME/ica-org0-key.pem ica-org0/msp/keystore</span><br><span class="line">cp $HOME/ca-cert.pem ica-org0/msp/cacerts</span><br><span class="line">cp $HOME/ca-cert.pem ica-org0/msp/intermediate/certs</span><br><span class="line">cp $HOME/ica-org0-cert.pem ica-org0/msp/signcerts</span><br><span class="line">cat ica-org0/ca-certs.pem ica-org0/msp/cacerts/ca-certs.pem &gt; ica-org0/ca-chaim.pem</span><br></pre></td></tr></table></figure>
+
+<p>按照相同的方式，构造org1、org2的中间ca服务器目录。</p>
+</li>
+</ol>
+<p>测试使用fabric-ca，为三个组织的中间ca服务器生成公私钥和tls证书，然后修改<a href="https://github.com/swordboy/fabric-samples/tree/release-1.1/fabric-ca" target="_blank" rel="noopener">社区例子</a>，可以正常运行。</p>
+<h2 id="2-3-使用cryptogen生成的根证书"><a href="#2-3-使用cryptogen生成的根证书" class="headerlink" title="2.3 使用cryptogen生成的根证书"></a>2.3 使用cryptogen生成的根证书</h2><p>可以使用crypotgen预先生成的各组织的根证书和对应私钥作为启动条件，代表这个组织来管理用户，可参考网络资料<a href="http://www.cnblogs.com/studyzy/p/7482451.html" target="_blank" rel="noopener">Fabric CA环境的集成</a>进行操作验证。</p>
+<h1 id="3-fabric-ca功能测试"><a href="#3-fabric-ca功能测试" class="headerlink" title="3 fabric-ca功能测试"></a>3 fabric-ca功能测试</h1><p>参考2.1或者2.2完成环境集成后，开始测试。</p>
+<h2 id="3-1-增加用户"><a href="#3-1-增加用户" class="headerlink" title="3.1 增加用户"></a>3.1 增加用户</h2><p>在简单功能测试的基础上，以peerOrg1组织的管理员身份注册用户</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=$HOME/cas/ica-peerOrg1</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg1-ca-chain.pem</span><br><span class="line">fabric-ca-client enroll -d -u https://admin:adminpw@ica-peerOrg1:7054</span><br><span class="line">fabric-ca-client register -d --id.name user2-peerOrg1 --id.secret password</span><br></pre></td></tr></table></figure>
+
+<p>切换至新创建的用户，生成msp目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /tmp/user2</span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/tmp/user2</span><br><span class="line">fabric-ca-client enroll -d -u https://user2-peerOrg1:password@ica-peerOrg1:7054</span><br><span class="line">cp -r /tmp/user2/msp/cacerts /tmp/user2/msp/cacerts </span><br><span class="line">cp -r /tmp/user2/msp/cacerts/ /tmp/user2/msp/tlscacerts</span><br><span class="line">cp -r /tmp/user2/msp/intermediatecerts /tmp/user2/msp/tlsintermediatecerts</span><br><span class="line">cp -r /tmp/user2/msp/signcerts /tmp/user2/msp/admincerts</span><br></pre></td></tr></table></figure>
+
+<p>切换至新增用户，测试调用chaincode。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">export CORE_PEER_LOCALMSPID=peerOrg1MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/tmp/user2/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">转账</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n mycc -c '&#123;"Args":["invoke","b","a","10"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">分别再查询</span></span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line">peer chaincode query -C mychannel -n mycc -c '&#123;"Args":["query","b"]&#125;'</span><br></pre></td></tr></table></figure>
+
+<p>可以正常执行，说明新创建的用户身份有效。</p>
+<h2 id="3-2-ABAC验证"><a href="#3-2-ABAC验证" class="headerlink" title="3.2 ABAC验证"></a>3.2 ABAC验证</h2><p>使用修改过的社区<a href="https://github.com/swordboy/fabric-samples/tree/release-1.1/chaincode/abac/go" target="_blank" rel="noopener">ABAC</a>例子。涉及ABAC权限的相关代码如下图，检查用户证书必须带有<code>abac.init=true:ecert</code>属性。</p>
+<p>即前面给各个peer组织创建的管理员用户所带的自定义属性。</p>
+<p><img src="/post/15ebafa6/1526451004951.png" alt="1526451004951"></p>
+<p>以peerOrg1组织的管理员<code>admin-peerOrg1</code>为例，其证书通过<code>openssl</code>查询，可见增加的扩展属性</p>
+<p><img src="/post/15ebafa6/1526433100254.png" alt="1526433100254"></p>
+<p>使用如下的命令测试chaincode的abac校验，只允许管理员身份来实例化chaincode。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">在peer0-peerOrg1上安装和实例化chaincode</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg1MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg1-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg1:7051</span><br><span class="line"><span class="meta">#</span><span class="bash">安装chaincode，无须设置，系统限制只能管理员来安装chaincode</span></span><br><span class="line">peer chaincode install -n abac -v 1.0 -p github.com/chaincode/abac/go/</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">实例化，增加背书策略</span></span><br><span class="line">peer chaincode instantiate -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n abac -v 1.0 -c '&#123;"Args":["init","a","100","b","200"]&#125;' -P 'OR('\''peerOrg1MSP.member'\'','\''peerOrg2MSP.member'\'')' </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">转账</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n abac -c '&#123;"Args":["invoke","b","a","100"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">分别再查询</span></span><br><span class="line">peer chaincode query -C mychannel -n abac -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">切换至用户身份，再转账</span></span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg1/user-peerOrg1/msp</span><br><span class="line"><span class="meta">#</span><span class="bash">会因为用户证书不存在属性而失败Attribute <span class="string">'abac.init'</span> was not found</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n abac -c '&#123;"Args":["invoke","b","a","1"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">用户可以正常查询信息</span></span><br><span class="line">peer chaincode query -C mychannel -n abac -c '&#123;"Args":["query","b"]&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">在peer0-peerOrg2上安装</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg2MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line"><span class="meta">#</span><span class="bash">安装chaincode</span></span><br><span class="line">peer chaincode install -n abac -v 1.0 -p github.com/chaincode/abac/go/</span><br><span class="line"><span class="meta">#</span><span class="bash">每个channel中，同名chaincode实例化一次，无须再执行</span></span><br><span class="line"><span class="meta">#</span><span class="bash">通过peer0-peerOrg2执行chaincode</span></span><br><span class="line">peer chaincode invoke -o orderer:7050 --tls true --cafile /data/ordererOrg-ca-chain.pem -C mychannel -n abac -c '&#123;"Args":["invoke","b","a","10"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">分别再查询</span></span><br><span class="line">peer chaincode query -C mychannel -n abac -c '&#123;"Args":["query","a"]&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">切换至用户身份再查询</span></span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/user-peerOrg2/msp</span><br><span class="line">peer chaincode query -C mychannel -n abac -c '&#123;"Args":["query","b"]&#125;'</span><br></pre></td></tr></table></figure>
+
+
+
+<p>##3.3 吊销用户</p>
+<p>在abac测试流程的基础上，增加吊销用户证书的流程。</p>
+<p>吊销用户证书和动态增加组织一样，都需要通过configtxlator工具来辅助，同事需要使用中间ca服务器来生成CRL(CertificateRevocationList)，分发到各个组织。</p>
+<p>吊销一个用户，需要经过以下流程。</p>
+<p>1）生成CRL</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">切换至管理员身份，生成CRL</span></span><br><span class="line">export CORE_PEER_LOCALMSPID=peerOrg2MSP</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/admin/msp</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=/data/peerOrg2-ca-chain.pem</span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_ADDRESS=peer0-peerOrg2:7051</span><br><span class="line"><span class="meta">#</span><span class="bash">只想到管理员的msp目录</span></span><br><span class="line">export FABRIC_CA_CLIENT_HOME=/data/orgs/peerOrg2/admin</span><br><span class="line">export FABRIC_CA_CLIENT_TLS_CERTFILES=/data/peerOrg2-ca-chain.pem</span><br><span class="line"><span class="meta">#</span><span class="bash">吊销用户，生成CRL，会在msp下生成crls/crl*.pem文件</span></span><br><span class="line">fabric-ca-client revoke -d --revoke.name user-peerOrg2 --gencrl</span><br></pre></td></tr></table></figure>
+
+<p>命令执行完成后，在<code>$/msp/crls</code>目录下生成一个crl.pem文件。</p>
+<p><img src="/post/15ebafa6/1526452053966.png" alt="1526452053966"></p>
+<p>2）修改channel配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">cd /data</span><br><span class="line"><span class="meta">#</span><span class="bash">1.获取channel配置，生成一个protobuff格式的文件</span></span><br><span class="line">peer channel fetch config mychannel_block.pb -c mychannel -o orderer:7050 --tls --cafile /data/ordererOrg-ca-chain.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">2.启动configtxlator，解析pb文件。会产生一个7059的监听服务</span></span><br><span class="line">configtxlator start &amp;</span><br><span class="line">configtxlator_pid=$!</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">3.转换channel配置的protobuff格式为json</span></span><br><span class="line">curl -X POST --data-binary @mychannel_block.pb http://127.0.0.1:7059/protolator/decode/common.Block &gt; mychannel_block.json</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">4.修改配置json，增加吊销证书信息</span></span><br><span class="line">jq .data.data[0].payload.data.config mychannel_block.json &gt; config.json</span><br><span class="line">crl=$(cat $CORE_PEER_MSPCONFIGPATH/crls/crl*.pem | base64 | tr -d '\n')</span><br><span class="line">cat config.json | jq '.channel_group.groups.Application.groups.peerOrg2.values.MSP.value.config.revocation_list = ["'"$&#123;crl&#125;"'"]' &gt; updated_config.json</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">5.生成配置块的更新diff protobuff文件</span></span><br><span class="line">curl -X POST --data-binary @config.json http://127.0.0.1:7059/protolator/encode/common.Config &gt; config.pb</span><br><span class="line">curl -X POST --data-binary @updated_config.json http://127.0.0.1:7059/protolator/encode/common.Config &gt; updated_config.pb</span><br><span class="line">curl -X POST -F original=@config.pb -F updated=@updated_config.pb http://127.0.0.1:7059/configtxlator/compute/update-from-configs -F channel=mychannel &gt; channel_update.pb</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">6.转换配置块更新protobuff为json</span></span><br><span class="line">curl -X POST --data-binary @channel_update.pb http://127.0.0.1:7059/protolator/decode/common.ConfigUpdate &gt;channel_update.json</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">7.生成peer channel update命令所需要的envelope protobuff文件</span></span><br><span class="line">echo '&#123;"payload":&#123;"header":&#123;"channel_header":&#123;"channel_id":"mychannel", "type":2&#125;&#125;,"data":&#123;"config_update":'$(cat channel_update.json)'&#125;&#125;&#125;' &gt; channel_update_envelope.json</span><br><span class="line">curl -X POST --data-binary @channel_update_envelope.json http://127.0.0.1:7059/protolator/encode/common.Envelope &gt; channel_update_envelope.pb</span><br><span class="line"></span><br><span class="line">kill -9 $configtxlator_pid</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">8.更新channel配置</span></span><br><span class="line">peer channel update -f channel_update_envelope.pb -c mychannel -o orderer:7050 --tls --cafile /data/ordererOrg-ca-chain.pem</span><br></pre></td></tr></table></figure>
+
+<p>3）验证用户已吊销</p>
+<p>切换到用户身份，执行chaincode的查询命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export CORE_PEER_MSPCONFIGPATH=/data/orgs/peerOrg2/user-peerOrg2/msp</span><br><span class="line">peer chaincode query -C mychannel -n abac -c '&#123;"Args":["query","b"]&#125;'</span><br></pre></td></tr></table></figure>
+
+<p>执行失败产生类似如图的异常</p>
+<p><img src="/post/15ebafa6/1526452493919.png" alt="1526452493919"></p>
+<p>同时在peer0-peerOrg2上可见日志，说明证书已经吊销成功。</p>
+<p><img src="/post/15ebafa6/1526452543934.png" alt="1526452543934"></p>
+<p>以用户身份，向ca中间服务器请求重新生成证书。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export FABRIC_CA_CLIENT_HOME=/tmp/user</span><br><span class="line">fabric-ca-client enroll -d -u https://user-peerOrg2:password@ica-peerOrg2:7054</span><br></pre></td></tr></table></figure>
+
+<p>从ca中间服务器上可见日志，用户已吊销，无法重新生成证书。</p>
+<p><img src="/post/15ebafa6/1526454067561.png" alt="1526454067561"></p>
+<p>#附录</p>
+<h2 id="证书目录结构"><a href="#证书目录结构" class="headerlink" title="证书目录结构"></a>证书目录结构</h2><p>tls目录用于节点启动时，自身所使用的公私钥。</p>
+<p>msp目录用于表示节点的身份。主要包括以下几个子目录</p>
+<ul>
+<li>admincerts：这个身份的管理员证书。对peer节点来说，admincerts应当是组织的管理员证书。其它case一般与signcerts是一样的。</li>
+<li>cacerts：组织的根证书</li>
+<li>keystore：这个身份的私钥，用来签名数据。</li>
+<li>（可选）intermediatecerts：组织的中间根证书</li>
+<li>signcerts：这个身份的公钥</li>
+<li>tlscacerts：组织tls通信的根证书</li>
+<li>（可选）tlsintermediatecerts：组织tls通信的中间根证书</li>
+</ul>
+<p><code>cryptogen</code>程序生成各个证书目录及其作用如下图所示：</p>
+<p><img src="/post/15ebafa6/msp_structure.png" alt="证书目录结构"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>1）在cryptogen生成的根证书和私钥，启动组织的fabric-ca服务，管理此组织的用户。</p>
+<p><a href="http://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html" target="_blank" rel="noopener">http://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html</a></p>
+<p>2）社区的fabric-ca例子</p>
+<p><a href="https://github.com/hyperledger/fabric-samples/tree/release-1.1/fabric-ca" target="_blank" rel="noopener">https://github.com/hyperledger/fabric-samples/tree/release-1.1/fabric-ca</a></p>
+<p>特点：</p>
+<ul>
+<li><p>每个组织都有一个根ca和中间ca。</p>
+<p>原则上来说，从脚本执行来看，可以让所有组织都使用同一个ca来进行管理。</p>
+</li>
+<li><p>示例脚本自带验证用户的注册、登录、吊销证书等测试case。</p>
+</li>
+</ul>
+<p>3）修改过的社区fabric-ca例子</p>
+<p><a href="https://github.com/swordboy/fabric-samples/tree/release-1.1/fabric-ca" target="_blank" rel="noopener">https://github.com/swordboy/fabric-samples/tree/release-1.1/fabric-ca</a></p>
+<ul>
+<li><p>使用自定义fabric-ca服务器生成中间根证书、tls证书等文件。手动生成中间根证书的命令。</p>
+<p><code>fabric-ca-server init -b admin:adminpw -u $PARENT_URL</code></p>
+<p>即可在<code>FABRIC_CA_CLIENT_HOME</code>环境变量的目录得到准备好的中间根证书。</p>
+</li>
+<li><p>没有根ca服务器，直接使用中间ca服务器管理组织</p>
+</li>
+</ul>
+<p>4）手动搭建环境的yaml和配置</p>
+<p><a href="https://github.com/swordboy/fabric_examples/tree/master/ca" target="_blank" rel="noopener">https://github.com/swordboy/fabric_examples/tree/master/ca</a></p>
+<ul>
+<li><p>fabric-ca的功能测试case</p>
+</li>
+<li><p>添加用户</p>
+</li>
+<li><p>吊销用户</p>
+</li>
+<li><p>abac检查</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2018-12-08, 15:30:16</p>
+        <p><span>最后更新:</span>2021-02-09, 10:16:15</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/15ebafa6.html" title="fabric-ca生成所有证书搭建fabric环境">https://mrfengjian.github.io/post/15ebafa6.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/15ebafa6.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/24f83bc7.html">
+                    一步一步搭建kafka共识的fabric环境
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/c4b38323.html">
+                    一步一步搭建fabric网络环境
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基于fabric-ca手动搭建fabric网络"><span class="toc-number">1.</span> <span class="toc-text">基于fabric-ca手动搭建fabric网络</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-简介"><span class="toc-number">2.</span> <span class="toc-text">1 简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-fabric-ca的集成场景"><span class="toc-number">3.</span> <span class="toc-text">2 fabric ca的集成场景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-使用fabric-ca管理所有证书"><span class="toc-number">3.1.</span> <span class="toc-text">2.1 使用fabric-ca管理所有证书</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-生成orderer组织公私钥"><span class="toc-number">3.1.1.</span> <span class="toc-text">2.1.1 生成orderer组织公私钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-生成peer组织公私钥"><span class="toc-number">3.1.2.</span> <span class="toc-text">2.1.2 生成peer组织公私钥</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成peerOrg1组织公私钥"><span class="toc-number">3.1.2.1.</span> <span class="toc-text">生成peerOrg1组织公私钥</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成peerOrg2组织公私钥"><span class="toc-number">3.1.2.2.</span> <span class="toc-text">生成peerOrg2组织公私钥</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-3-生成创世块和channel配置"><span class="toc-number">3.1.3.</span> <span class="toc-text">2.1.3 生成创世块和channel配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-4-启动fabric网络并进行基本测试"><span class="toc-number">3.1.4.</span> <span class="toc-text">2.1.4 启动fabric网络并进行基本测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#创建channel并加入peer"><span class="toc-number">3.1.4.1.</span> <span class="toc-text">创建channel并加入peer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#测试chaincode基本功能"><span class="toc-number">3.1.4.2.</span> <span class="toc-text">测试chaincode基本功能</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-使用fabric-ca结合用户提供根证书"><span class="toc-number">3.2.</span> <span class="toc-text">2.2 使用fabric-ca结合用户提供根证书</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-使用cryptogen生成的根证书"><span class="toc-number">3.3.</span> <span class="toc-text">2.3 使用cryptogen生成的根证书</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-fabric-ca功能测试"><span class="toc-number">4.</span> <span class="toc-text">3 fabric-ca功能测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-增加用户"><span class="toc-number">4.1.</span> <span class="toc-text">3.1 增加用户</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-ABAC验证"><span class="toc-number">4.2.</span> <span class="toc-text">3.2 ABAC验证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#证书目录结构"><span class="toc-number">4.3.</span> <span class="toc-text">证书目录结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">4.4.</span> <span class="toc-text">参考资料</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"fabric-ca生成所有证书搭建fabric环境　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/24f83bc7.html" title="上一篇: 一步一步搭建kafka共识的fabric环境">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/c4b38323.html" title="下一篇: 一步一步搭建fabric网络环境">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

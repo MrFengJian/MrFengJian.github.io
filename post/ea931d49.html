@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="在WSL下，设置完善的命令行开发环境，很多命令行由于需要使用github或者直接访问国外网站，经常被墙或者速度极慢，给出了解决之道。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WSL命令行开发环境设置">
+<meta property="og:url" content="https://mrfengjian.github.io/post/ea931d49.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="在WSL下，设置完善的命令行开发环境，很多命令行由于需要使用github或者直接访问国外网站，经常被墙或者速度极慢，给出了解决之道。">
+<meta property="og:image" content="https://mrfengjian.github.io/post/ea931d49/image-20210401105053852.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/ea931d49/image-20210401111326172.png">
+<meta property="article:published_time" content="2021-04-01T02:42:38.000Z">
+<meta property="article:modified_time" content="2021-04-01T05:41:33.972Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="操作系统设置">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="wsl">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/ea931d49/image-20210401105053852.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>WSL命令行开发环境设置 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-wsl-env-config" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/ea931d49.html" class="article-date">
+      <time datetime="2021-04-01T02:42:38.000Z" itemprop="datePublished">2021-04-01</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      WSL命令行开发环境设置
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="启用WSL"><a href="#启用WSL" class="headerlink" title="启用WSL"></a>启用WSL</h1><p>在开始菜单搜索”启用或关闭Windows功能“，找到“适用于Linux的Windows子系统”，勾选即可。</p>
+<p><img src="/post/ea931d49/image-20210401105053852.png" alt="image-20210401105053852"></p>
+<p>操作系统会自动安装更新，并且提示重启操作系统，重启即可。</p>
+<h1 id="安装Windows-Terminal"><a href="#安装Windows-Terminal" class="headerlink" title="安装Windows Terminal"></a>安装Windows Terminal</h1><p>在Microsoft  Store中，搜索Windows Terminal即可，它是目前Windows上最方便实用的命令行工具。并且Windows Terminal会自动创建 WSL 链接，可以很方便地切换，安装即可。</p>
+<h1 id="使用LxRunOffline安装发行版"><a href="#使用LxRunOffline安装发行版" class="headerlink" title="使用LxRunOffline安装发行版"></a>使用LxRunOffline安装发行版</h1><p>在Microsoft Store中，直接安装发行版，会安装到系统盘下，很容易浪费宝贵的系统盘空间。<a href="https://github.com/DDoSolitary/LxRunOffline/releases" target="_blank" rel="noopener">LxRunOffline</a>支持在任意目录安装发行版，并对其进行备份、转移等各种便捷操作。下载后，可以直接绿色使用，在其目录下执行命令行即可，可用命令行选项如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Supported actions are:</span><br><span class="line">    l, list            List all installed distributions.</span><br><span class="line">    gd, get-default    Get the default distribution, which is used by bash.exe.</span><br><span class="line">    sd, set-default    Set the default distribution, which is used by bash.exe.</span><br><span class="line">    i, install         Install a new distribution.</span><br><span class="line">    ui, uninstall      Uninstall a distribution.</span><br><span class="line">    rg, register       Register an existing installation directory.</span><br><span class="line">    ur, unregister     Unregister a distribution but not delete the installation directory.</span><br><span class="line">    m, move            Move a distribution to a new directory.</span><br><span class="line">    d, duplicate       Duplicate an existing distribution in a new directory.</span><br><span class="line">    e, export          Export a distribution's filesystem to a .tar.gz file, which can be imported by the "install" command.</span><br><span class="line">    r, run             Run a command in a distribution.</span><br><span class="line">    di, get-dir        Get the installation directory of a distribution.</span><br><span class="line">    gv, get-version    Get the filesystem version of a distribution.</span><br><span class="line">    ge, get-env        Get the default environment variables of a distribution.</span><br><span class="line">    se, set-env        Set the default environment variables of a distribution.</span><br><span class="line">    ae, add-env        Add to the default environment variables of a distribution.</span><br><span class="line">    re, remove-env     Remove from the default environment variables of a distribution.</span><br><span class="line">    gu, get-uid        Get the UID of the default user of a distribution.</span><br><span class="line">    su, set-uid        Set the UID of the default user of a distribution.</span><br><span class="line">    gk, get-kernelcmd  Get the default kernel command line of a distribution.</span><br><span class="line">    sk, set-kernelcmd  Set the default kernel command line of a distribution.</span><br><span class="line">    gf, get-flags      Get some flags of a distribution. See https://docs.microsoft.com/en-us/previous-versions/windows/desktop/api/wslapi/ne-wslapi-wsl_distribution_flags for details.</span><br><span class="line">    sf, set-flags      Set some flags of a distribution. See https://docs.microsoft.com/en-us/previous-versions/windows/desktop/api/wslapi/ne-wslapi-wsl_distribution_flags for details.</span><br><span class="line">    s, shortcut        Create a shortcut to launch a distribution.</span><br><span class="line">    ec, export-config  Export configuration of a distribution to an XML file.</span><br><span class="line">    ic, import-config  Import configuration of a distribution from an XML file.</span><br><span class="line">    sm, summary        Get general information of a distribution.</span><br><span class="line">    version            Get version information about this LxRunOffline.exe.</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装发行版"><a href="#安装发行版" class="headerlink" title="安装发行版"></a>安装发行版</h2><p>从<a href="https://docs.microsoft.com/zh-cn/windows/wsl/install-manual" target="_blank" rel="noopener">微软官方网站</a>，下载想要使用的发行版，以 Ubuntu 18.04 为例，其下载地址为<code>https://aka.ms/wsl-ubuntu-1804</code>，下载完成后，将其后缀文件名修改为zip，使用解压软件从中提取 <code>install.tar.gz</code>，使用 下列命令安装即可：</p>
+<p><code>./LxRunOffline.exe i -n &lt;WSL名称&gt; -d &lt;安装路径&gt; -f &lt;安装包路径&gt;.tar.gz</code></p>
+<blockquote>
+<p>使用<code>-s</code>选项，会自动创建一个桌面快捷方式。</p>
+</blockquote>
+<p>微软官方商店提供了Ubuntu、Debian、Fedora、SUSE等操作系统，如果想要尝鲜Arch系的发行版，可以使用社区打包好的版本<a href="https://github.com/yuk7/ArchWSL/releases" target="_blank" rel="noopener">ArchWSL</a>，下载好最新版本后，将<code>Arch.zip</code>解压到任意可读写的目录，执行其中的<code>Arch.exe</code>即可将一个发行版安装到当前目录，使用更加方便。</p>
+<h2 id="配置发行版"><a href="#配置发行版" class="headerlink" title="配置发行版"></a>配置发行版</h2><h3 id="配置Windows-Terminal的WSL外观"><a href="#配置Windows-Terminal的WSL外观" class="headerlink" title="配置Windows Terminal的WSL外观"></a>配置Windows Terminal的WSL外观</h3><p>安装好WSL发行版后，Windows Terminal会自动为其添加一个快捷链接进行切换，如下图所示。</p>
+<p><img src="/post/ea931d49/image-20210401111326172.png" alt="image-20210401111326172"></p>
+<p>默认图标不是很美观，可以通过<code>设置</code>调整其配置项，调整WSL发行版对应配置如下，所有配置项可以参考<a href>链接</a>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This file was initially generated by Windows Terminal 1.0.1811.0</span></span><br><span class="line"><span class="comment">// It should still be usable in newer versions, but newer versions might have additional</span></span><br><span class="line"><span class="comment">// settings, help text, or changes that you will not see unless you clear this file</span></span><br><span class="line"><span class="comment">// and let us generate a new one for you.</span></span><br><span class="line"><span class="comment">// To view the default settings, hold "alt" while clicking on the "Settings" button.</span></span><br><span class="line"><span class="comment">// For documentation on these settings, see: https://aka.ms/terminal-documentation</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"$schema"</span>: <span class="string">"https://aka.ms/terminal-profiles-schema"</span>,</span><br><span class="line">    <span class="attr">"defaultProfile"</span>: <span class="string">"&#123;61c54bbd-c2c6-5271-96e7-009a87ff44bf&#125;"</span>,</span><br><span class="line">    <span class="comment">// You can add more global application settings here.</span></span><br><span class="line">    <span class="comment">// To learn more about global settings, visit https://aka.ms/terminal-global-settings</span></span><br><span class="line">    <span class="comment">// If enabled, selections are automatically copied to your clipboard.</span></span><br><span class="line">    <span class="attr">"copyOnSelect"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// If enabled, formatted data is also copied to your clipboard</span></span><br><span class="line">    <span class="attr">"copyFormatting"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// A profile specifies a command to execute paired with information about how it should look and feel.</span></span><br><span class="line">    <span class="comment">// Each one of them will appear in the 'New Tab' dropdown,</span></span><br><span class="line">    <span class="comment">//   and can be invoked from the commandline with `wt.exe -p xxx`</span></span><br><span class="line">    <span class="comment">// To learn more about profiles, visit https://aka.ms/terminal-profile-settings</span></span><br><span class="line">    <span class="attr">"profiles"</span>: &#123;</span><br><span class="line">        <span class="attr">"defaults"</span>: &#123;</span><br><span class="line">            <span class="comment">// Put settings here that you want to apply to all profiles.</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"list"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Make changes here to the powershell.exe profile.</span></span><br><span class="line">                <span class="attr">"guid"</span>: <span class="string">"&#123;61c54bbd-c2c6-5271-96e7-009a87ff44bf&#125;"</span>,</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"Windows PowerShell"</span>,</span><br><span class="line">                <span class="attr">"commandline"</span>: <span class="string">"powershell.exe"</span>,</span><br><span class="line">                <span class="attr">"startingDirectory"</span>: <span class="string">"D:/Workspaces/"</span>,</span><br><span class="line">                <span class="attr">"colorScheme"</span>: <span class="string">"Brogrammer"</span>,</span><br><span class="line">                <span class="attr">"historySize"</span>: <span class="number">2000</span>,</span><br><span class="line">                <span class="attr">"fontSize"</span>: <span class="number">14</span>,</span><br><span class="line">                <span class="attr">"hidden"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"guid"</span>: <span class="string">"&#123;9a549227-0bad-5c01-ab6d-9dbfe9447357&#125;"</span>,</span><br><span class="line">                <span class="attr">"hidden"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"dev"</span>,</span><br><span class="line">                <span class="attr">"colorScheme"</span>: <span class="string">"Brogrammer"</span>,</span><br><span class="line">                <span class="attr">"icon"</span>: <span class="string">"F:/wsl/ubuntu.png"</span>,</span><br><span class="line">                <span class="attr">"fontSize"</span>: <span class="number">14</span>,</span><br><span class="line">                <span class="attr">"startingDirectory"</span>: <span class="string">"D:/Workspaces/"</span>,</span><br><span class="line">                <span class="attr">"source"</span>: <span class="string">"Windows.Terminal.Wsl"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Make changes here to the powershell.exe profile</span></span><br><span class="line">                <span class="attr">"guid"</span>: <span class="string">"&#123;2f519d07-31ac-4d8e-906c-ce0fe47ddcf1&#125;"</span>,</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"Git Bash"</span>,</span><br><span class="line">                <span class="attr">"historySize"</span>: <span class="number">2000</span>,</span><br><span class="line">                <span class="attr">"commandline"</span>: <span class="string">"C:/Program Files/Git/bin/bash.exe"</span>,</span><br><span class="line">                <span class="attr">"icon"</span>: <span class="string">"F:/wsl/git.png"</span>,</span><br><span class="line">                <span class="attr">"fontSize"</span>: <span class="number">14</span>,</span><br><span class="line">                <span class="attr">"colorScheme"</span>: <span class="string">"Brogrammer"</span>,</span><br><span class="line">                <span class="attr">"startingDirectory"</span>: <span class="string">"D:/Workspaces/"</span>,</span><br><span class="line">                <span class="attr">"hidden"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Make changes here to the cmd.exe profile.</span></span><br><span class="line">                <span class="attr">"guid"</span>: <span class="string">"&#123;0caa0dad-35be-5f56-a8ff-afceeeaa6101&#125;"</span>,</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"命令提示符"</span>,</span><br><span class="line">                <span class="attr">"commandline"</span>: <span class="string">"cmd.exe"</span>,</span><br><span class="line">                <span class="attr">"hidden"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"guid"</span>: <span class="string">"&#123;b453ae62-4e3d-5e58-b989-0a998ec441b8&#125;"</span>,</span><br><span class="line">                <span class="attr">"hidden"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"name"</span>: <span class="string">"Azure Cloud Shell"</span>,</span><br><span class="line">                <span class="attr">"source"</span>: <span class="string">"Windows.Terminal.Azure"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// Add custom color schemes to this array.</span></span><br><span class="line">    <span class="comment">// 添加自定义控制台显示方案</span></span><br><span class="line">    <span class="comment">// To learn more about color schemes, visit https://aka.ms/terminal-color-schemes</span></span><br><span class="line">    <span class="attr">"schemes"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"Brogrammer"</span>,</span><br><span class="line">            <span class="attr">"black"</span>: <span class="string">"#1f1f1f"</span>,</span><br><span class="line">            <span class="attr">"red"</span>: <span class="string">"#f81118"</span>,</span><br><span class="line">            <span class="attr">"green"</span>: <span class="string">"#2dc55e"</span>,</span><br><span class="line">            <span class="attr">"yellow"</span>: <span class="string">"#ecba0f"</span>,</span><br><span class="line">            <span class="attr">"blue"</span>: <span class="string">"#2a84d2"</span>,</span><br><span class="line">            <span class="attr">"purple"</span>: <span class="string">"#4e5ab7"</span>,</span><br><span class="line">            <span class="attr">"cyan"</span>: <span class="string">"#1081d6"</span>,</span><br><span class="line">            <span class="attr">"white"</span>: <span class="string">"#d6dbe5"</span>,</span><br><span class="line">            <span class="attr">"brightBlack"</span>: <span class="string">"#d6dbe5"</span>,</span><br><span class="line">            <span class="attr">"brightRed"</span>: <span class="string">"#de352e"</span>,</span><br><span class="line">            <span class="attr">"brightGreen"</span>: <span class="string">"#1dd361"</span>,</span><br><span class="line">            <span class="attr">"brightYellow"</span>: <span class="string">"#f3bd09"</span>,</span><br><span class="line">            <span class="attr">"brightBlue"</span>: <span class="string">"#1081d6"</span>,</span><br><span class="line">            <span class="attr">"brightPurple"</span>: <span class="string">"#5350b9"</span>,</span><br><span class="line">            <span class="attr">"brightCyan"</span>: <span class="string">"#0f7ddb"</span>,</span><br><span class="line">            <span class="attr">"brightWhite"</span>: <span class="string">"#ffffff"</span>,</span><br><span class="line">            <span class="attr">"background"</span>: <span class="string">"#131313"</span>,</span><br><span class="line">            <span class="attr">"foreground"</span>: <span class="string">"#d6dbe5"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="comment">// Add custom keybindings to this array.</span></span><br><span class="line">    <span class="comment">// To unbind a key combination from your defaults.json, set the command to "unbound".</span></span><br><span class="line">    <span class="comment">// To learn more about keybindings, visit https://aka.ms/terminal-keybindings</span></span><br><span class="line">    <span class="attr">"keybindings"</span>: [</span><br><span class="line">        <span class="comment">// Copy and paste are bound to Ctrl+Shift+C and Ctrl+Shift+V in your defaults.json.</span></span><br><span class="line">        <span class="comment">// These two lines additionally bind them to Ctrl+C and Ctrl+V.</span></span><br><span class="line">        <span class="comment">// To learn more about selection, visit https://aka.ms/terminal-selection</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"command"</span>: &#123;</span><br><span class="line">                <span class="attr">"action"</span>: <span class="string">"copy"</span>,</span><br><span class="line">                <span class="attr">"singleLine"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"keys"</span>: <span class="string">"ctrl+c"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"command"</span>: <span class="string">"paste"</span>,</span><br><span class="line">            <span class="attr">"keys"</span>: <span class="string">"ctrl+v"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// Press Ctrl+Shift+F to open the search box</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"command"</span>: <span class="string">"find"</span>,</span><br><span class="line">            <span class="attr">"keys"</span>: <span class="string">"ctrl+shift+f"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// Press Alt+Shift+D to open a new pane.</span></span><br><span class="line">        <span class="comment">// - "split": "auto" makes this pane open in the direction that provides the most surface area.</span></span><br><span class="line">        <span class="comment">// - "splitMode": "duplicate" makes the new pane use the focused pane's profile.</span></span><br><span class="line">        <span class="comment">// To learn more about panes, visit https://aka.ms/terminal-panes</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"command"</span>: &#123;</span><br><span class="line">                <span class="attr">"action"</span>: <span class="string">"splitPane"</span>,</span><br><span class="line">                <span class="attr">"split"</span>: <span class="string">"auto"</span>,</span><br><span class="line">                <span class="attr">"splitMode"</span>: <span class="string">"duplicate"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"keys"</span>: <span class="string">"alt+shift+d"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="登陆用户"><a href="#登陆用户" class="headerlink" title="登陆用户"></a>登陆用户</h3><p>使用上述方式安装的发行版，默认使用root用户进入命令行，不是很安全，可以使用<code>LxRunOffline</code>工具调整默认用户。</p>
+<p>安装好发行版以后，使用Windows Terminal，登陆进入WSL发行版的命令行。</p>
+<p>创建用户：</p>
+<p><code>useradd -m -s /bin/bash &lt;用户名&gt;</code></p>
+<p>设置用户密码：</p>
+<p><code>passwd &lt;用户名&gt;</code></p>
+<p>为用户添加免密码<code>sudo</code>权限，修改<code>/etc/sudoers</code>文件，增加如下一行：</p>
+<p><code>%&lt;用户名&gt; ALL=(ALL:ALL) NOPASSWD:ALL</code></p>
+<blockquote>
+<p>sudoers文件为系统保护文件，使用vim修改完成退出时，需要使用<code>:wq!</code>强行退出。</p>
+</blockquote>
+<p>查询用户ID，一般情况下为<code>1000</code>：</p>
+<p><code>id -u &lt;用户名&gt;</code></p>
+<p>使用<code>LxRunOffline</code>命令行修改默认用户：</p>
+<p><code>LxRunOffline.exe su -n &lt;WSL名称&gt; -v &lt;用户ID&gt;</code></p>
+<h3 id="文件权限问题"><a href="#文件权限问题" class="headerlink" title="文件权限问题"></a>文件权限问题</h3><p>默认情况下，Windows系统的磁盘挂载到目录在WSL发行版中是777权限，并且默认属于root用户，很不方便使用，创建或者修改<code>/etc/wsl.conf</code>文件，增加如下内容</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[automount]</span></span><br><span class="line"><span class="attr">enabled</span> = <span class="literal">true</span></span><br><span class="line"><span class="attr">root</span> = /mnt/</span><br><span class="line"><span class="attr">options</span> = <span class="string">"metadata,dmask=022,fmask=133"</span></span><br><span class="line"><span class="attr">mountFsTab</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p>修改完成后，退出WSL发行版。在Windows Powershell中，执行下列命令强行关闭WSL发行版，以便加载配置</p>
+<p><code>wsl --shutdown</code></p>
+<p>重新进入WSL发行版后，可以看到登陆的用户为指定用户，权限也是正常的755的目录权限。但是在发行版命令行中创建的文件还是777，需要进行调整</p>
+<p>修改<code>.bashrc</code>（如果Shell使用zsh，则修改.zshrc），增加如下内容即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [[ "$(umask)" == '000' ]]; then</span><br><span class="line">    umask 022</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<h3 id="软件源设置"><a href="#软件源设置" class="headerlink" title="软件源设置"></a>软件源设置</h3><p>使用常规方式，替换其安装源为国内镜像源。以<code>Ubuntu 18.04</code>为例，替换<code>/etc/apt/sources.list</code>内容为阿里云镜像源。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb [arch&#x3D;amd64] http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;docker-ce&#x2F;linux&#x2F;ubuntu bionic stable</span><br><span class="line"># deb-src [arch&#x3D;amd64] http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;docker-ce&#x2F;linux&#x2F;ubuntu bionic stable</span><br></pre></td></tr></table></figure>
+
+<p>执行<code>sudo apt-get update</code>更新缓存。</p>
+<h3 id="常用依赖包"><a href="#常用依赖包" class="headerlink" title="常用依赖包"></a>常用依赖包</h3><p>安装常用软件</p>
+<p><code>sudo apt-get install git make gcc zsh jq -y</code></p>
+<p>安装docker客户端</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> step 1: 安装必要的一些系统工具</span></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common</span><br><span class="line"><span class="meta">#</span><span class="bash"> step 2: 安装GPG证书</span></span><br><span class="line">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -</span><br><span class="line"><span class="meta">#</span><span class="bash"> Step 3: 写入软件源信息</span></span><br><span class="line">sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"</span><br><span class="line"><span class="meta">#</span><span class="bash"> Step 4: 更新并安装 Docker-CE</span></span><br><span class="line">sudo apt-get -y update</span><br><span class="line">sudo apt-get -y install docker-ce</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装指定版本的Docker-CE:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Step 1: 查找Docker-CE的版本:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> apt-cache madison docker-ce</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   docker-ce | 17.03.1~ce-0~ubuntu-xenial | http://mirrors.aliyun.com/docker-ce/linux/ubuntu xenial/stable amd64 Packages</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   docker-ce | 17.03.0~ce-0~ubuntu-xenial | http://mirrors.aliyun.com/docker-ce/linux/ubuntu xenial/stable amd64 Packages</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Step 2: 安装指定版本的Docker-CE: (VERSION 例如上面的 17.03.1~ce-0~ubuntu-xenial)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> sudo apt-get -y install docker-ce</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>使用export DOCKER_HOST=tcp://&lt;远程DOCKER主机&gt;:2375方式访问远端的容器资源。</p>
+</blockquote>
+<h3 id="安装oh-my-zsh"><a href="#安装oh-my-zsh" class="headerlink" title="安装oh-my-zsh"></a>安装oh-my-zsh</h3><blockquote>
+<p>由于github下载速度过慢，使用<strong>fastgit.org</strong>的镜像来进行安装。</p>
+</blockquote>
+<p>使用下列命令安装</p>
+<p><code>sh -c &quot;$(wget https://raw.fastgit.org/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)&quot;</code></p>
+<p>安装插件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 根据历史记录和补全历史，自动补全</span></span><br><span class="line">git clone https://hub.fastgit.org/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions</span><br><span class="line"><span class="meta">#</span><span class="bash"> 语法高亮插件</span></span><br><span class="line">git clone https://hub.fastgit.org/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting</span><br></pre></td></tr></table></figure>
+
+<p>配置<code>~/.zshrc</code>，启用插件和主题，并使用命令<code>source ~/.zshrc</code>重新加载配置</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ZSH_THEME</span>=<span class="string">"ys"</span></span><br><span class="line"><span class="attr">plugins</span>=(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/ea931d49.html">WSL命令行开发环境设置</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2021-04-01, 10:42:38</p>
+        <p><span>最后更新:</span>2021-04-01, 13:41:33</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/ea931d49.html" title="WSL命令行开发环境设置">https://mrfengjian.github.io/post/ea931d49.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/ea931d49.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/9c6b0310.html">
+                    Go语言Channel编程模式
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#启用WSL"><span class="toc-number">1.</span> <span class="toc-text">启用WSL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安装Windows-Terminal"><span class="toc-number">2.</span> <span class="toc-text">安装Windows Terminal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用LxRunOffline安装发行版"><span class="toc-number">3.</span> <span class="toc-text">使用LxRunOffline安装发行版</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装发行版"><span class="toc-number">3.1.</span> <span class="toc-text">安装发行版</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置发行版"><span class="toc-number">3.2.</span> <span class="toc-text">配置发行版</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#配置Windows-Terminal的WSL外观"><span class="toc-number">3.2.1.</span> <span class="toc-text">配置Windows Terminal的WSL外观</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#登陆用户"><span class="toc-number">3.2.2.</span> <span class="toc-text">登陆用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件权限问题"><span class="toc-number">3.2.3.</span> <span class="toc-text">文件权限问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#软件源设置"><span class="toc-number">3.2.4.</span> <span class="toc-text">软件源设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常用依赖包"><span class="toc-number">3.2.5.</span> <span class="toc-text">常用依赖包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装oh-my-zsh"><span class="toc-number">3.2.6.</span> <span class="toc-text">安装oh-my-zsh</span></a></li></ol></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"WSL命令行开发环境设置　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/9c6b0310.html" title="下一篇: Go语言Channel编程模式">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
