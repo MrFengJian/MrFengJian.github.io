@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="超级链通过wasm、native、solidity多种工作模式，支持包括go、java、solidity、C++等多种受众广泛的编程语言来编写智能合约，开发门槛低。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在超级链上使用和开发智能合约">
+<meta property="og:url" content="https://mrfengjian.github.io/post/4505b11e.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="超级链通过wasm、native、solidity多种工作模式，支持包括go、java、solidity、C++等多种受众广泛的编程语言来编写智能合约，开发门槛低。">
+<meta property="article:published_time" content="2021-04-20T01:48:47.000Z">
+<meta property="article:modified_time" content="2021-04-20T06:24:03.088Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="区块链">
+<meta property="article:tag" content="超级链">
+<meta name="twitter:card" content="summary">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>在超级链上使用和开发智能合约 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B6%85%E7%BA%A7%E9%93%BE/" rel="tag">超级链</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-xuperchain-smart-contract" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/4505b11e.html" class="article-date">
+      <time datetime="2021-04-20T01:48:47.000Z" itemprop="datePublished">2021-04-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在超级链上使用和开发智能合约
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag">区块链</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%B6%85%E7%BA%A7%E9%93%BE/" rel="tag">超级链</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="智能合约支持"><a href="#智能合约支持" class="headerlink" title="智能合约支持"></a>智能合约支持</h1><h2 id="XVM"><a href="#XVM" class="headerlink" title="XVM"></a>XVM</h2><p>超级链定义了XVM虚拟机为智能合约的运行提供隔离的安全沙箱。</p>
+<ul>
+<li>隔离性，合约运行环境和xchain运行环境互不影响，合约的崩溃不影响xchain。</li>
+<li>确定性，合约可以访问链上资源，但不能访问宿主机资源，保证在确定的输入下有确定的输出</li>
+<li>可停止性，设置资源quota，合约对资源的使用超quota自动停止</li>
+<li>可以统计合约的资源使用情况，如CPU，内存等</li>
+<li>运行速度尽量快。</li>
+</ul>
+<p>在运行过程中，智能合约被编译为WASM字节码在XVM上运行。</p>
+<blockquote>
+<p>WASM是WebAssembly的缩写，是一种运行在浏览器上的字节码，用于解决js在浏览器上的性能不足的问题。 WASM的指令跟机器码很相似，因此很多高级语言如C，C++，Go，rust等都可以编译成WASM字节码从而可以运行在浏览器上。 很多性能相关的模块可以通过用C/C++来编写，再编译成WASM来提高性能，如视频解码器，运行在网页的游戏引擎，React的虚拟Dom渲染算法等。</p>
+<p>WASM本身只是一个指令集，并没有限定运行环境，因此只要实现相应的解释器，WASM也可以运行在非浏览器环境。 xchain的WASM合约正是这样的应用场景，通过用C++，go等高级语言来编写智能合约，再编译成WASM字节码，最后由XVM虚拟机来运行。 XVM虚拟机在这里就提供了一个WASM的运行环境。</p>
+</blockquote>
+<h2 id="智能合约运行模式"><a href="#智能合约运行模式" class="headerlink" title="智能合约运行模式"></a>智能合约运行模式</h2><h3 id="wasm"><a href="#wasm" class="headerlink" title="wasm"></a>wasm</h3><p>C++合约的运行模式，将智能合约通过<code>hub.baidubce.com/xchain/emcc</code>容器来编译成WASM字节码，然后通过直接部署到XVM虚拟机上运行。</p>
+<h3 id="native"><a href="#native" class="headerlink" title="native"></a>native</h3><p>Golang、Java合约的运行模式，将智能合约编译为二进制或者Jar包，直接运行或者在容器容器内运行。</p>
+<h3 id="solidity"><a href="#solidity" class="headerlink" title="solidity"></a>solidity</h3><p>Solidity合约的运行模式，使用EVM模式运行。</p>
+<h1 id="native-GO合约使用"><a href="#native-GO合约使用" class="headerlink" title="native GO合约使用"></a>native GO合约使用</h1><h2 id="示例合约的使用"><a href="#示例合约的使用" class="headerlink" title="示例合约的使用"></a>示例合约的使用</h2><blockquote>
+<p>注意保持GOPATH，建议使用golang 1.13以上版本，启用Go Modules</p>
+</blockquote>
+<ol>
+<li><p>编译</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> core/contractsdk/go/example/counter</span><br><span class="line">$ go build</span><br><span class="line">go: downloading github.com/go-playground/validator/v10 v10.4.1</span><br><span class="line">$ ls</span><br><span class="line">counter  main.go</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建合约账户</p>
+<p>超级链中，部署合约必须使用<strong>合约账户</strong>，与普通账户不同，合约账户具备ACL属性，表示多节点签名之和满足阈值后才可成功使用合约账户，类似于fabric中的背书策略。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli account new --account 1111111111111111 --fee 1000</span><br><span class="line">contract response:</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"pm"</span>: &#123;</span><br><span class="line">                <span class="string">"rule"</span>: 1,</span><br><span class="line">                <span class="string">"acceptValue"</span>: 1.0</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"aksWeight"</span>: &#123;</span><br><span class="line">                <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>: 1.0</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">The gas you cousume is: 1000</span><br><span class="line">The fee you pay is: 1000</span><br><span class="line">Tx id: 38fee75d1c4b5cf3707a0f77501c5bc24a1384307fbf226aa3cf6b3028b8b02b</span><br><span class="line">account name: XC1111111111111111@xuper</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>账户的ID为16为全局唯一的数字，账户名格式为 XC+ID+@super</p>
+</blockquote>
+<p>查询账户余额，确保有足够费用来部署智能合约</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli account balance XC1111111111111111@xuper -H 127.0.0.1:37101</span><br><span class="line">0</span><br><span class="line"><span class="comment"># 如果余额不足，需要进行转账</span></span><br><span class="line">$ ./xchain-cli transfer --to  XC1111111111111111@xuper --amount 10000 --keys data/keys/ -H 127.0.0.1:37101</span><br><span class="line">1af4580f6899155f80784db67cf14b01a8cc6a39d00364a8493916500a0eb368</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署合约</p>
+<p>使用命令行<strong>在当前节点</strong>部署合约，如果出现如下所示费用不足的情况，可能是<code>--fee</code>选项支付的费用或者合约账号的余额不足以字符。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli native deploy --account XC1111111111111111@xuper --fee 15587517 --runtime go -a <span class="string">'&#123;"creator":"XC1111111111111111@xuper"&#125;'</span>   --cname golangcounter ../core/contractsdk/go/example/counter/counter</span><br><span class="line">contract response:</span><br><span class="line">The gas you cousume is: 10870804</span><br><span class="line">The fee you pay is: 15587517</span><br><span class="line">Select utxo error, details:NOT_ENOUGH_UTXO_ERROR</span><br><span class="line"><span class="comment"># 费用不足，按提示设置费用即可</span></span><br><span class="line">$ ./xchain-cli native deploy --account XC1111111111111111@xuper --fee 10870804 --runtime go -a <span class="string">'&#123;"creator":"XC1111111111111111@xuper"&#125;'</span>   --cname golangcounter ../core/contractsdk/go/example/counter/counter</span><br><span class="line">contract response:</span><br><span class="line">The gas you cousume is: 10870804</span><br><span class="line">The fee you pay is: 10870804</span><br><span class="line">Tx id: 9170ce7e03e3bc03881206217d91e79df9b0df1045a94f952b911fe455251cf6</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果xchain.yaml中，配置使用docker容器来运行native合约，则需要提前手动将相关镜像准备好，默认为<code>docker.io/centos:7.5.1804</code>，且docker服务必须在本地运行，以便进行文件传输。</p>
+</blockquote>
+</li>
+<li><p>测试合约功能</p>
+<p>调用合约需要支付费用，如果费用不足，会产生错误提示<code>You need add fee</code>或者<code>NOT_ENOUGH_UTXO_ERROR</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli native invoke --method Increase -a <span class="string">'&#123;"key":"test"&#125;'</span> golangcounter --fee 53</span><br><span class="line">contract response: 1</span><br><span class="line">The gas you cousume is: 53</span><br><span class="line">The fee you pay is: 53</span><br><span class="line">Tx id: 2e1bf5763c104db0ae34c7263ad6a18f7180f5b98e479420c32a4566b17497b2</span><br></pre></td></tr></table></figure>
+
+<p>查询合约不需要支付费用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli native query --method Get -a <span class="string">'&#123;"key":"test"&#125;'</span> golangcounter</span><br><span class="line">contract response: 1</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="智能合约GO-SDK介绍"><a href="#智能合约GO-SDK介绍" class="headerlink" title="智能合约GO SDK介绍"></a>智能合约GO SDK介绍</h2><p>智能合约的Go SDK在代码路径<code>core/contractsdk/go</code>下，其接口文件为<a href="https://github.com/xuperchain/xuperchain/blob/master/core/contractsdk/go/code/context.go" target="_blank" rel="noopener">core/contractsdk/go/code/context.go</a>：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Args() <code>map[string][]byte</code></td>
+<td>获取传入合约的参数表</td>
+</tr>
+<tr>
+<td>Initiator() string</td>
+<td>获取发起此合约调用的账号</td>
+</tr>
+<tr>
+<td>AuthRequire() []string</td>
+<td>获取授权此合约调用的账号</td>
+</tr>
+<tr>
+<td>PutObject(key []byte, value []byte) error</td>
+<td>进行一次写操作</td>
+</tr>
+<tr>
+<td>GetObject(key []byte) ([]byte, error)</td>
+<td>进行一次读操作</td>
+</tr>
+<tr>
+<td>DeleteObject(key []byte) error</td>
+<td>进行一次删除操作</td>
+</tr>
+<tr>
+<td>NewIterator(start, limit []byte) Iterator</td>
+<td>获得遍历合约存储的迭代器</td>
+</tr>
+<tr>
+<td>QueryTx(txid string) (*pb.Transaction, error)</td>
+<td>查询指定id的交易内容</td>
+</tr>
+<tr>
+<td>QueryBlock(blockid string) (*pb.Block, error)</td>
+<td>查询指定id的区块内容</td>
+</tr>
+<tr>
+<td>Transfer(to string, amount *big.Int) error</td>
+<td>进行转账操作</td>
+</tr>
+<tr>
+<td>TransferAmount() (*big.Int, error)</td>
+<td>获取合约调用操作中的转账数额</td>
+</tr>
+<tr>
+<td>Call(module, contract, method string, args … ) (*Response, error)</td>
+<td>调用其他合约</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/4505b11e.html">在超级链上使用和开发智能合约</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2021-04-20, 09:48:47</p>
+        <p><span>最后更新:</span>2021-04-20, 14:24:03</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/4505b11e.html" title="在超级链上使用和开发智能合约">https://mrfengjian.github.io/post/4505b11e.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/4505b11e.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/dd1671c6.html">
+                    超级链多节点部署
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#智能合约支持"><span class="toc-number">1.</span> <span class="toc-text">智能合约支持</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#XVM"><span class="toc-number">1.1.</span> <span class="toc-text">XVM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#智能合约运行模式"><span class="toc-number">1.2.</span> <span class="toc-text">智能合约运行模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wasm"><span class="toc-number">1.2.1.</span> <span class="toc-text">wasm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#native"><span class="toc-number">1.2.2.</span> <span class="toc-text">native</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#solidity"><span class="toc-number">1.2.3.</span> <span class="toc-text">solidity</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#native-GO合约使用"><span class="toc-number">2.</span> <span class="toc-text">native GO合约使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#示例合约的使用"><span class="toc-number">2.1.</span> <span class="toc-text">示例合约的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#智能合约GO-SDK介绍"><span class="toc-number">2.2.</span> <span class="toc-text">智能合约GO SDK介绍</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"在超级链上使用和开发智能合约　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/dd1671c6.html" title="下一篇: 超级链多节点部署">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/4505b11e.html">在超级链上使用和开发智能合约</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd1671c6.html">超级链多节点部署</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

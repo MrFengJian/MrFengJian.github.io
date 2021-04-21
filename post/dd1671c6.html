@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="冯建建" />
+
+
+
+<meta name="description" content="超级链的多节点手动部署实践和相关功能的验证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="超级链多节点部署">
+<meta property="og:url" content="https://mrfengjian.github.io/post/dd1671c6.html">
+<meta property="og:site_name" content="冯建建的博客">
+<meta property="og:description" content="超级链的多节点手动部署实践和相关功能的验证">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/arch.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/image-20210419154745101.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/image-20210419154854659.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/image-20210419171014573.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/image-20210419171119834.png">
+<meta property="og:image" content="https://mrfengjian.github.io/post/dd1671c6/image-20210419171318834.png">
+<meta property="article:published_time" content="2021-04-19T01:13:45.000Z">
+<meta property="article:modified_time" content="2021-04-20T06:24:48.097Z">
+<meta property="article:author" content="冯建建">
+<meta property="article:tag" content="区块链">
+<meta property="article:tag" content="超级链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mrfengjian.github.io/post/dd1671c6/arch.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="冯建建的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/Coding.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>超级链多节点部署 | 冯建建的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.jpg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">冯建建</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">工作学习中的备忘录</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/MrFengJian" target="_blank" rel="noopener" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chaincode/" rel="tag">chaincode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/channel/" rel="tag">channel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric/" rel="tag">fabric</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fabric-ca/" rel="tag">fabric-ca</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka%E5%85%B1%E8%AF%86/" rel="tag">kafka共识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/" rel="tag">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl/" rel="tag">wsl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" rel="tag">分布式环境部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">并发编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">操作系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6/" rel="tag">智能合约</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E7%BD%AE/" rel="tag">系统设置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B4%A6%E6%9C%AC/" rel="tag">账本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B6%85%E7%BA%A7%E9%93%BE/" rel="tag">超级链</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">冯建建</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.jpg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">冯建建</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">工作学习中的备忘录</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:fengjianjian007@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/MrFengJian" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-xuperchain-multi-nodes" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/post/dd1671c6.html" class="article-date">
+      <time datetime="2021-04-19T01:13:45.000Z" itemprop="datePublished">2021-04-19</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      超级链多节点部署
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/work/">工作</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag">区块链</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%B6%85%E7%BA%A7%E9%93%BE/" rel="tag">超级链</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="超级链简介"><a href="#超级链简介" class="headerlink" title="超级链简介"></a>超级链简介</h1><p>超级链是百度开源的联盟链方案，XuperChain是超级链体系下的第一个开源项目，是构建超级联盟网络的底层方案。</p>
+<p>其主要特点是高性能，通过原创的XuperModel模型，真正实现了智能合约的并行执行和验证，通过自研的WASM虚拟机，做到了指令集级别的极致优化。</p>
+<p>在架构方面，其可插拔、插件化的设计使得用户可以方便选择适合自己业务场景的解决方案，通过独有的XuperBridge技术，可插拔多语言虚拟机，从而支持丰富的合约开发语言。</p>
+<p>在网络能力方面，XuperChain具备全球化部署能力，节点通信基于加密的P2P网络，支持广域网超大规模节点，且底层账本支持分叉管理，自动收敛一致性，TDPOS算法确保了大规模节点下的快速共识。在账号安全方面，XuperChain内置了多私钥保护的账号体系，支持权重累计、集合运算等灵活的策略。</p>
+<p><img src="/post/dd1671c6/arch.png" alt="XuperChain架构"></p>
+<h1 id="准备部署包"><a href="#准备部署包" class="headerlink" title="准备部署包"></a>准备部署包</h1><h2 id="从源码编译"><a href="#从源码编译" class="headerlink" title="从源码编译"></a>从源码编译</h2><ol>
+<li><p>准备依赖</p>
+<p><code>sudo apt-get install make g++ gcc</code></p>
+<p>安装1.11以上的<code>golang</code>，并配置PATH和GOPATH。</p>
+</li>
+<li><p>下载源码，并进行编译</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果github访问很慢，可以考虑使用国内镜像地址https://gitee.com/baidu/xuperchain.git</span></span><br><span class="line">git clone https://github.com/xuperchain/xuperchain.git</span><br><span class="line">cd xuperchain</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译完成后，所有部署所需都在<code>output</code>目录下</p>
+<table>
+<thead>
+<tr>
+<th>目录名</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>output/</td>
+<td>节点根目录</td>
+</tr>
+<tr>
+<td>├─ conf</td>
+<td>xchain.yaml: xchain服务的配置信息（注意端口冲突） plugins.conf: 插件的配置信息</td>
+</tr>
+<tr>
+<td>├─ data</td>
+<td>数据的存放目录，创世块信息，以及共识和合约的样例</td>
+</tr>
+<tr>
+<td>│ ··· ├─ blockchain</td>
+<td>账本目录</td>
+</tr>
+<tr>
+<td>│ ··· ├─ keys</td>
+<td>此节点的地址，具有全局唯一性</td>
+</tr>
+<tr>
+<td>│ ··· ├─ netkeys</td>
+<td>此节点的网络标识ID，具有全局唯一性</td>
+</tr>
+<tr>
+<td>│ ··· └─ config</td>
+<td>包括创始的共识，初始的资源数，矿工奖励机制等</td>
+</tr>
+<tr>
+<td>├─ logs</td>
+<td>程序日志目录</td>
+</tr>
+<tr>
+<td>├─ plugins</td>
+<td>so扩展的存放目录</td>
+</tr>
+<tr>
+<td>├─ xchain</td>
+<td>xchain服务的二进制文件</td>
+</tr>
+<tr>
+<td>├─ xchain-cli</td>
+<td>xchain客户端工具</td>
+</tr>
+<tr>
+<td>└─ wasm2c</td>
+<td>wasm工具（智能合约会用到）</td>
+</tr>
+<tr>
+<td>└─ xdev</td>
+<td>智能合约编译工具</td>
+</tr>
+<tr>
+<td>└─ xchain-httpgw</td>
+<td>xchain的http restful网关</td>
+</tr>
+</tbody></table>
+</li>
+<li></li>
+</ol>
+<h2 id="直接下载部署包"><a href="#直接下载部署包" class="headerlink" title="直接下载部署包"></a>直接下载部署包</h2><p>从github下载最新版发布包</p>
+<p><a href="https://github.com/xuperchain/xuperchain/releases" target="_blank" rel="noopener">https://github.com/xuperchain/xuperchain/releases</a></p>
+<p>国内可以使用CDN地址</p>
+<p><a href="https://cms-store.bj.bcebos.com/xuperchain-linux-amd64-v3.10.tar.gz" target="_blank" rel="noopener">https://cms-store.bj.bcebos.com/xuperchain-linux-amd64-v3.10.tar.gz</a></p>
+<h1 id="部署多节点"><a href="#部署多节点" class="headerlink" title="部署多节点"></a>部署多节点</h1><blockquote>
+<p>使用默认配置启动多节点网络，</p>
+<ul>
+<li>共识算法为tdpos，在data/config/xuper.json的<code>genesis_consensus</code>中配置</li>
+<li>不启用tls</li>
+<li>启用prometheus监控采集</li>
+</ul>
+</blockquote>
+<h2 id="启动第一个种子节点-bootNode"><a href="#启动第一个种子节点-bootNode" class="headerlink" title="启动第一个种子节点(bootNode)"></a>启动第一个种子节点(bootNode)</h2><p>首先需要启动若干个种子节点，作为超级链节点注册和相互路由的核心节点。种子节点与普通节点主要通过<code>xchain.yaml</code>配置进行区分，示例如下图所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># node config</span></span><br><span class="line"><span class="comment"># 日志配置</span></span><br><span class="line"><span class="attr">log:</span></span><br><span class="line">  <span class="comment"># 模块名称</span></span><br><span class="line">  <span class="attr">module:</span> <span class="string">xchain</span></span><br><span class="line">  <span class="comment"># 日志目录</span></span><br><span class="line">  <span class="attr">filepath:</span> <span class="string">logs</span></span><br><span class="line">  <span class="comment"># 日志文件名</span></span><br><span class="line">  <span class="attr">filename:</span> <span class="string">xchain</span></span><br><span class="line">  <span class="attr">fmt:</span> <span class="string">logfmt</span></span><br><span class="line">  <span class="comment"># 是否打印命令行工具端口</span></span><br><span class="line">  <span class="attr">console:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 日志等级</span></span><br><span class="line">  <span class="attr">level:</span> <span class="string">info</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># RPC 服务暴露的端口</span></span><br><span class="line"><span class="attr">tcpServer:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="string">:37101</span></span><br><span class="line">  <span class="comment"># prometheus监控指标端口, 为空的话就不启动</span></span><br><span class="line">  <span class="attr">metricPort:</span> <span class="string">:37200</span></span><br><span class="line">  <span class="attr">tls:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment">#cachePeriod: 2</span></span><br><span class="line">  <span class="comment"># 最大接受数据包长度</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 区块链节点配置</span></span><br><span class="line"><span class="attr">p2p:</span></span><br><span class="line">  <span class="comment"># module is the name of p2p module plugin, value is [p2pv2/p2pv1], default is p2pv2</span></span><br><span class="line">  <span class="attr">module:</span> <span class="string">p2pv2</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">47101</span></span><br><span class="line">  <span class="comment">#isTls: true</span></span><br><span class="line">  <span class="comment">#certPath: ./data/tls/1</span></span><br><span class="line">  <span class="comment">#serviceName: saas_test.server.com</span></span><br><span class="line">  <span class="comment">#bootNodes:</span></span><br><span class="line">  <span class="comment">#  - "/ip4/&lt;ip&gt;/tcp/&lt;port&gt;/p2p/&lt;node_hash&gt;" for p2pv2 or - "&lt;ip&gt;:&lt;port&gt;" for p2pv1</span></span><br><span class="line">  <span class="comment">#staticNodes:</span></span><br><span class="line">  <span class="comment">#  xuper:</span></span><br><span class="line">  <span class="comment">#    - "127.0.0.1:47102"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">miner:</span></span><br><span class="line">  <span class="comment"># 密钥存储路径</span></span><br><span class="line">  <span class="attr">keypath:</span> <span class="string">./data/keys</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据存储路径</span></span><br><span class="line"><span class="attr">datapath:</span> <span class="string">./data/blockchain</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 多盘存储的路径</span></span><br><span class="line"><span class="comment">#datapathOthers:</span></span><br><span class="line"><span class="comment">#    - /ssd1/blockchain</span></span><br><span class="line"><span class="comment">#    - /ssd2/blockchain</span></span><br><span class="line"><span class="comment">#    - /ssd3/blockchain</span></span><br><span class="line"></span><br><span class="line"><span class="attr">utxo:</span></span><br><span class="line">  <span class="comment"># utxo的内存LRUCache大小，表示内存中最多缓存多少个UtxoItem</span></span><br><span class="line">  <span class="attr">cachesize:</span> <span class="number">2000000</span></span><br><span class="line">  <span class="comment"># GenerateTx的临时锁定期限，默认是60秒</span></span><br><span class="line">  <span class="attr">tmplockSeconds:</span> <span class="number">60</span></span><br><span class="line">  <span class="comment">#单个块的合约执行的总时间(单位ms)</span></span><br><span class="line">  <span class="attr">contractExecutionTime:</span> <span class="number">500</span></span><br><span class="line"></span><br><span class="line"><span class="attr">kernel:</span></span><br><span class="line">  <span class="comment"># minNewChainAmount 设置创建平行链时最少要转多少钱到同链名address</span></span><br><span class="line">  <span class="attr">minNewChainAmount:</span> <span class="string">"100"</span></span><br><span class="line">  <span class="attr">newChainWhiteList:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 合约通用配置</span></span><br><span class="line"><span class="attr">contract:</span></span><br><span class="line">  <span class="attr">enableUpgrade:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># wasm合约配置</span></span><br><span class="line"><span class="attr">wasm:</span></span><br><span class="line">  <span class="attr">driver:</span> <span class="string">"xvm"</span></span><br><span class="line">  <span class="attr">xvm:</span></span><br><span class="line">    <span class="attr">optLevel:</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># evm合约配置</span></span><br><span class="line"><span class="attr">evm:</span></span><br><span class="line">  <span class="attr">driver:</span> <span class="string">"evm"</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 管理native合约的配置</span></span><br><span class="line"><span class="attr">native:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># docker相关配置</span></span><br><span class="line">  <span class="attr">docker:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line">    <span class="comment"># 合约运行的镜像名字</span></span><br><span class="line">    <span class="attr">imageName:</span> <span class="string">"docker.io/centos:7.5.1804"</span></span><br><span class="line">    <span class="comment"># cpu核数限制，可以为小数</span></span><br><span class="line">    <span class="attr">cpus:</span> <span class="number">1</span></span><br><span class="line">    <span class="comment"># 内存大小限制</span></span><br><span class="line">    <span class="attr">memory:</span> <span class="string">"1G"</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 停止合约的等待秒数，超时强制杀死</span></span><br><span class="line">  <span class="attr">stopTimeout:</span> <span class="number">3</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 插件配置文件路径</span></span><br><span class="line"><span class="attr">pluginConfPath:</span> <span class="string">"./conf/plugins.conf"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 是否启用p2p核心节点直连</span></span><br><span class="line"><span class="attr">coreConnection:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">txidCacheExpiredTime:</span> <span class="string">"10s"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 是否压缩交易/区块</span></span><br><span class="line"><span class="comment">#enableCompress: true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 块广播模式</span></span><br><span class="line"><span class="attr">blockBroadcaseMode:</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 剪枝配置</span></span><br><span class="line"><span class="attr">prune:</span></span><br><span class="line">  <span class="attr">switch:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">bcname:</span> <span class="string">"xuper"</span></span><br><span class="line">  <span class="attr">targetBlockid:</span> <span class="string">"xxx"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 背书服务相关配置</span></span><br><span class="line"><span class="attr">xendorser:</span></span><br><span class="line">  <span class="comment"># 是否开启默认的XEndorser背书服务</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">module:</span> <span class="string">"default"</span></span><br><span class="line">  <span class="comment">#confPath: "./conf/xendorser.yaml"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 云存储配置(AWS S3接口兼容)</span></span><br><span class="line"><span class="attr">cloudStorage:</span></span><br><span class="line">  <span class="attr">bucket:</span> <span class="string">"xchain-cloud-test"</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">"node1"</span></span><br><span class="line">  <span class="attr">ak:</span> <span class="string">""</span></span><br><span class="line">  <span class="attr">sk:</span> <span class="string">""</span></span><br><span class="line">  <span class="attr">region:</span> <span class="string">"bj"</span></span><br><span class="line">  <span class="attr">endpoint:</span> <span class="string">"s3.bj.bcebos.com"</span></span><br><span class="line">  <span class="attr">localCacheDir:</span> <span class="string">"./data/cache"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 事件订阅相关配置</span></span><br><span class="line"><span class="attr">event:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 每个ip的最大订阅连接数，为0的话不限连接数</span></span><br><span class="line">  <span class="attr">addrMaxConn:</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p>将编译或者下载的部署包，放到目录<code>n1</code>中，在此目录中，依次执行下列命令准备创世区块和启动服务。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./xchain-cli createChain</span><br><span class="line">nohup ./xchain &amp;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/post/dd1671c6/image-20210419154745101.png" alt="image-20210419154745101"></p>
+<p><img src="/post/dd1671c6/image-20210419154854659.png" alt="image-20210419154854659"></p>
+<p><strong>注意</strong>，使用下列命令，获取第一个节点的地址，用于启动其他节点。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli netURL get -H 127.0.0.1:37101</span><br><span class="line"><span class="string">"/ip4/127.0.0.1/tcp/47101/p2p/QmVxeNubpg1ZQjQT8W5yZC9fD7ZB1ViArwvyGUB53sqf8e"</span></span><br></pre></td></tr></table></figure>
+
+<p>其他节点使用127.0.0.1或者其他可达地址访问。<em>不要直接使用命令行的输出</em></p>
+<h2 id="启动其他种子节点"><a href="#启动其他种子节点" class="headerlink" title="启动其他种子节点"></a>启动其他种子节点</h2><p>在其他节点的<code>config/xchain.yaml</code>中，修改<code>tcpServer.port</code>和<code>p2p.port</code>，注意端口冲突。在bootNodes中，增加第一个种子节点的p2p地址，修改部分如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># RPC 服务暴露的端口</span></span><br><span class="line"><span class="attr">tcpServer:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="string">:37102</span></span><br><span class="line">  <span class="comment"># prometheus监控指标端口, 为空的话就不启动</span></span><br><span class="line">  <span class="attr">metricPort:</span> <span class="string">:37300</span></span><br><span class="line"><span class="attr">p2p:</span></span><br><span class="line">    <span class="attr">module:</span> <span class="string">p2pv2</span></span><br><span class="line">    <span class="string">//</span> <span class="string">port是节点p2p网络监听的默认端口，如果在一台机器上部署注意端口配置不要冲突，</span></span><br><span class="line">    <span class="string">//</span> <span class="string">node1配置的是47101，node2和node3可以分别设置为47102和47103</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">47102</span></span><br><span class="line">    <span class="string">//</span> <span class="string">节点加入网络所连接的种子节点的链接信息，</span></span><br><span class="line">    <span class="attr">bootNodes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"/ip4/127.0.0.1/tcp/47101/p2p/QmVxeNubpg1ZQjQT8W5yZC9fD7ZB1ViArwvyGUB53sqf8e"</span></span><br></pre></td></tr></table></figure>
+
+<p>执行下列命令，为节点准备新的身份，并启动节点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ rm -rf ./data/&#123;blockchain,keys,netkeys&#125;</span><br><span class="line">$ ./xchain-cli account newkeys -f</span><br><span class="line">$ ./xchain-cli netURL gen</span><br><span class="line">$ ./xchain-cli createChain</span><br><span class="line">$ nohup ./xchain &amp;</span><br></pre></td></tr></table></figure>
+
+<p>使用下列命令，来获取这个种子节点的地址</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli netURL get -H 192.168.137.1:37102</span><br><span class="line"><span class="string">"/ip4/127.0.0.1/tcp/47102/p2p/QmV7UnFbqxKMhuQVTSNDKr3FCCaNqfUk5nnLU86cqYiVdw"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="启动其他节点"><a href="#启动其他节点" class="headerlink" title="启动其他节点"></a>启动其他节点</h2><p>在其他普通节点的<code>config/xchain.yaml</code>中，修改<code>tcpServer.port</code>和<code>p2p.port</code>，注意端口冲突。在bootNodes中，增加第一个种子节点的p2p地址，修改部分如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># RPC 服务暴露的端口</span></span><br><span class="line"><span class="attr">tcpServer:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="string">:37102</span></span><br><span class="line">  <span class="comment"># prometheus监控指标端口, 为空的话就不启动</span></span><br><span class="line">  <span class="attr">metricPort:</span> <span class="string">:37300</span></span><br><span class="line"><span class="attr">p2p:</span></span><br><span class="line">    <span class="attr">module:</span> <span class="string">p2pv2</span></span><br><span class="line">    <span class="string">//</span> <span class="string">port是节点p2p网络监听的默认端口，如果在一台机器上部署注意端口配置不要冲突，</span></span><br><span class="line">    <span class="string">//</span> <span class="string">node1配置的是47101，node2和node3可以分别设置为47102和47103</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">47102</span></span><br><span class="line">    <span class="string">//</span> <span class="string">节点加入网络所连接的种子节点的链接信息，</span></span><br><span class="line">    <span class="attr">bootNodes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"/ip4/127.0.0.1/tcp/47101/p2p/QmVxeNubpg1ZQjQT8W5yZC9fD7ZB1ViArwvyGUB53sqf8e"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"/ip4/127.0.0.1/tcp/47102/p2p/QmV7UnFbqxKMhuQVTSNDKr3FCCaNqfUk5nnLU86cqYiVdw"</span></span><br></pre></td></tr></table></figure>
+
+<p>执行下列命令，为节点准备新的身份，并启动节点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ rm -rf ./data/&#123;blockchain,keys,netkeys&#125;</span><br><span class="line">$ ./xchain-cli account newkeys -f</span><br><span class="line">$ ./xchain-cli netURL gen</span><br><span class="line">$ ./xchain-cli createChain</span><br><span class="line">$ nohup ./xchain &amp;</span><br></pre></td></tr></table></figure>
+
+<h2 id="检查节点状态"><a href="#检查节点状态" class="headerlink" title="检查节点状态"></a>检查节点状态</h2><p>使用<code>xchain-cli</code>来检查三个节点的账本高度，一致则表示网络建立成功。</p>
+<blockquote>
+<p>-H 选项设置目标节点地址</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">for</span> i <span class="keyword">in</span> 1 2 3;<span class="keyword">do</span> <span class="built_in">echo</span> 127.0.0.1:3710<span class="variable">$i</span>;./xchain-cli status -H 127.0.0.1:3710<span class="variable">$i</span> |grep -i trunkHeight; <span class="keyword">done</span></span><br><span class="line">127.0.0.1:37101</span><br><span class="line">        <span class="string">"trunkHeight"</span>: 2097</span><br><span class="line">127.0.0.1:37102</span><br><span class="line">        <span class="string">"trunkHeight"</span>: 2097</span><br><span class="line">127.0.0.1:37103</span><br><span class="line">        <span class="string">"trunkHeight"</span>: 2097</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试网络功能"><a href="#测试网络功能" class="headerlink" title="测试网络功能"></a>测试网络功能</h1><h2 id="内置转账"><a href="#内置转账" class="headerlink" title="内置转账"></a>内置转账</h2><ol>
+<li>创建一个普通账户</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建普通用户, 包含地址，公钥，私钥</span></span><br><span class="line">./xchain-cli account newkeys --output data/bob</span><br><span class="line"><span class="comment"># 在bob目录下会看到文件address，publickey，privatekey生成</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/post/dd1671c6/image-20210419171014573.png" alt="image-20210419171014573"></p>
+<ol start="2">
+<li>查询账户余额</li>
+</ol>
+<p>向网络请求查询账户余额，返回结果为<code>keys</code>参数指向的私钥地址持有的余额。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./xchain-cli account balance --keys data/keys -H 127.0.0.1:37101</span><br></pre></td></tr></table></figure>
+
+<p><img src="/post/dd1671c6/image-20210419171119834.png" alt="image-20210419171119834"></p>
+<ol start="3">
+<li>转账</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./xchain-cli transfer --to ZsrBwh8PJtDKAQpq5GwqscKgb5ejB18y7 --amount 10 --keys data/keys/ -H 127.0.0.1:37101</span><br><span class="line"><span class="comment"># 地址可以通过查看给bob分配的地址</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/post/dd1671c6/image-20210419171318834.png" alt="image-20210419171318834"></p>
+<ol start="4">
+<li>检查用户<code>bob</code>余额</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./xchain-cli account balance --keys data/bob -H 127.0.0.1:37101</span><br><span class="line">10</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>查询交易和区块的信息</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 可查询上一步生成的txid的交易信息</span></span><br><span class="line">$ ./xchain-cli tx query 416130c2a3b1f4ba67e1b32e7ad11b59f4884b2d0a8f6d1fbe851ed14c912e08 -H 127.0.0.1:37101</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"txid"</span>: <span class="string">"416130c2a3b1f4ba67e1b32e7ad11b59f4884b2d0a8f6d1fbe851ed14c912e08"</span>,</span><br><span class="line">  <span class="string">"blockid"</span>: <span class="string">"597b1c1bba077a0c0ef09e75f5526242becde19fd0f9086f3420a46471503605"</span>,</span><br><span class="line">  <span class="string">"txInputs"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"refTxid"</span>: <span class="string">"66869e420ae3573b19b3326cd852a7a3074d222993c322042e0bf94a4cab862f"</span>,</span><br><span class="line">      <span class="string">"refOffset"</span>: 0,</span><br><span class="line">      <span class="string">"fromAddr"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>,</span><br><span class="line">      <span class="string">"amount"</span>: <span class="string">"1000000"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"txOutputs"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"amount"</span>: <span class="string">"10"</span>,</span><br><span class="line">      <span class="string">"toAddr"</span>: <span class="string">"ZsrBwh8PJtDKAQpq5GwqscKgb5ejB18y7"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"amount"</span>: <span class="string">"999990"</span>,</span><br><span class="line">      <span class="string">"toAddr"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"desc"</span>: <span class="string">"transfer from console"</span>,</span><br><span class="line">  <span class="string">"nonce"</span>: <span class="string">"161882353298498081"</span>,</span><br><span class="line">  <span class="string">"timestamp"</span>: 1618823532402329500,</span><br><span class="line">  <span class="string">"version"</span>: 1,</span><br><span class="line">  <span class="string">"autogen"</span>: <span class="literal">false</span>,</span><br><span class="line">  <span class="string">"coinbase"</span>: <span class="literal">false</span>,</span><br><span class="line">  <span class="string">"txInputsExt"</span>: null,</span><br><span class="line">  <span class="string">"txOutputsExt"</span>: null,</span><br><span class="line">  <span class="string">"contractRequests"</span>: null,</span><br><span class="line">  <span class="string">"initiator"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>,</span><br><span class="line">  <span class="string">"authRequire"</span>: [</span><br><span class="line">    <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"initiatorSigns"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"publickey"</span>: <span class="string">"&#123;\"Curvname\":\"P-256\",\"X\":74695617477160058757747208220371236837474210247114418775262229497812962582435,\"Y\":51348715319124770392993866417088542497927816017012182211244120852620959209571&#125;"</span>,</span><br><span class="line">      <span class="string">"sign"</span>: <span class="string">"3045022036fe5b48143346800a5b90ba6f24c9a08ff4272501520dc88b22a5b08d8f300e022100fbe0d4f1ca47fcfc78b6fa600452eea88720f545f55a4a9c7fb17d05afbd93c1"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"authRequireSigns"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"publickey"</span>: <span class="string">"&#123;\"Curvname\":\"P-256\",\"X\":74695617477160058757747208220371236837474210247114418775262229497812962582435,\"Y\":51348715319124770392993866417088542497927816017012182211244120852620959209571&#125;"</span>,</span><br><span class="line">      <span class="string">"sign"</span>: <span class="string">"3045022057d0efcf7642d65949bd9373a7fac0743f34a84ca67c3fbc7a4b8e38204888bf022100c85b48e03ad93b57abdf3f322a70b211982215c7121ae5ea30d210390f54c131"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"receivedTimestamp"</span>: 1618823532412563300,</span><br><span class="line">  <span class="string">"modifyBlock"</span>: &#123;</span><br><span class="line">    <span class="string">"marked"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"effectiveHeight"</span>: 0,</span><br><span class="line">    <span class="string">"effectiveTxid"</span>: <span class="string">""</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 查询交易对应的区块信息</span></span><br><span class="line">$ ./xchain-cli tx query 597b1c1bba077a0c0ef09e75f5526242becde19fd0f9086f3420a46471503605 -H 127.0.0.1:37101</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"version"</span>: 1,</span><br><span class="line">  <span class="string">"blockid"</span>: <span class="string">"597b1c1bba077a0c0ef09e75f5526242becde19fd0f9086f3420a46471503605"</span>,</span><br><span class="line">  <span class="string">"preHash"</span>: <span class="string">"6a5e8a5af85cbddc58170e9d786efc47c2a705e4b81dcff69331f329062a6177"</span>,</span><br><span class="line">  <span class="string">"proposer"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>,</span><br><span class="line">  <span class="string">"sign"</span>: <span class="string">"3045022100f429488187cae1a921d241e1d39cf505f854f1d8148e4ece901d381961ef24fd0220209fddc3aec6fb670d0e1c1bce497ed1889f0b7e5139be584bfea46481d44c1e"</span>,</span><br><span class="line">  <span class="string">"pubkey"</span>: <span class="string">"&#123;\"Curvname\":\"P-256\",\"X\":74695617477160058757747208220371236837474210247114418775262229497812962582435,\"Y\":51348715319124770392993866417088542497927816017012182211244120852620959209571&#125;"</span>,</span><br><span class="line">  <span class="string">"merkleRoot"</span>: <span class="string">"7ab7a4688b09f759e58aa1990a991c767702fcb993159f62a925c4c3dbe63ec2"</span>,</span><br><span class="line">  <span class="string">"height"</span>: 1497,</span><br><span class="line">  <span class="string">"timestamp"</span>: 1618823535000440400,</span><br><span class="line">  <span class="string">"transactions"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"txid"</span>: <span class="string">"416130c2a3b1f4ba67e1b32e7ad11b59f4884b2d0a8f6d1fbe851ed14c912e08"</span>,</span><br><span class="line">      <span class="string">"blockid"</span>: <span class="string">"597b1c1bba077a0c0ef09e75f5526242becde19fd0f9086f3420a46471503605"</span>,</span><br><span class="line">      <span class="string">"txInputs"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"refTxid"</span>: <span class="string">"66869e420ae3573b19b3326cd852a7a3074d222993c322042e0bf94a4cab862f"</span>,</span><br><span class="line">          <span class="string">"refOffset"</span>: 0,</span><br><span class="line">          <span class="string">"fromAddr"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>,</span><br><span class="line">          <span class="string">"amount"</span>: <span class="string">"1000000"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"txOutputs"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"amount"</span>: <span class="string">"10"</span>,</span><br><span class="line">          <span class="string">"toAddr"</span>: <span class="string">"ZsrBwh8PJtDKAQpq5GwqscKgb5ejB18y7"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"amount"</span>: <span class="string">"999990"</span>,</span><br><span class="line">          <span class="string">"toAddr"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"desc"</span>: <span class="string">"transfer from console"</span>,</span><br><span class="line">      <span class="string">"nonce"</span>: <span class="string">"161882353298498081"</span>,</span><br><span class="line">      <span class="string">"timestamp"</span>: 1618823532402329500,</span><br><span class="line">      <span class="string">"version"</span>: 1,</span><br><span class="line">      <span class="string">"autogen"</span>: <span class="literal">false</span>,</span><br><span class="line">      <span class="string">"coinbase"</span>: <span class="literal">false</span>,</span><br><span class="line">      <span class="string">"txInputsExt"</span>: null,</span><br><span class="line">      <span class="string">"txOutputsExt"</span>: null,</span><br><span class="line">      <span class="string">"contractRequests"</span>: null,</span><br><span class="line">      <span class="string">"initiator"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span>,</span><br><span class="line">      <span class="string">"authRequire"</span>: [</span><br><span class="line">        <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"initiatorSigns"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"publickey"</span>: <span class="string">"&#123;\"Curvname\":\"P-256\",\"X\":74695617477160058757747208220371236837474210247114418775262229497812962582435,\"Y\":51348715319124770392993866417088542497927816017012182211244120852620959209571&#125;"</span>,</span><br><span class="line">          <span class="string">"sign"</span>: <span class="string">"3045022036fe5b48143346800a5b90ba6f24c9a08ff4272501520dc88b22a5b08d8f300e022100fbe0d4f1ca47fcfc78b6fa600452eea88720f545f55a4a9c7fb17d05afbd93c1"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"authRequireSigns"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"publickey"</span>: <span class="string">"&#123;\"Curvname\":\"P-256\",\"X\":74695617477160058757747208220371236837474210247114418775262229497812962582435,\"Y\":51348715319124770392993866417088542497927816017012182211244120852620959209571&#125;"</span>,</span><br><span class="line">          <span class="string">"sign"</span>: <span class="string">"3045022057d0efcf7642d65949bd9373a7fac0743f34a84ca67c3fbc7a4b8e38204888bf022100c85b48e03ad93b57abdf3f322a70b211982215c7121ae5ea30d210390f54c131"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"receivedTimestamp"</span>: 1618823532412563300,</span><br><span class="line">      <span class="string">"modifyBlock"</span>: &#123;</span><br><span class="line">        <span class="string">"marked"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="string">"effectiveHeight"</span>: 0,</span><br><span class="line">        <span class="string">"effectiveTxid"</span>: <span class="string">""</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"txid"</span>: <span class="string">"8af509d52ac61485ac064e2aa8c42bfd86a3f7b6a1ac6f966c280bad5c730998"</span>,</span><br><span class="line">      <span class="string">"blockid"</span>: <span class="string">"597b1c1bba077a0c0ef09e75f5526242becde19fd0f9086f3420a46471503605"</span>,</span><br><span class="line">      <span class="string">"txInputs"</span>: null,</span><br><span class="line">      <span class="string">"txOutputs"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">"amount"</span>: <span class="string">"1000000"</span>,</span><br><span class="line">          <span class="string">"toAddr"</span>: <span class="string">"dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="string">"desc"</span>: <span class="string">"1"</span>,</span><br><span class="line">      <span class="string">"nonce"</span>: <span class="string">""</span>,</span><br><span class="line">      <span class="string">"timestamp"</span>: 1618823535001215300,</span><br><span class="line">      <span class="string">"version"</span>: 1,</span><br><span class="line">      <span class="string">"autogen"</span>: <span class="literal">false</span>,</span><br><span class="line">      <span class="string">"coinbase"</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="string">"txInputsExt"</span>: null,</span><br><span class="line">      <span class="string">"txOutputsExt"</span>: null,</span><br><span class="line">      <span class="string">"contractRequests"</span>: null,</span><br><span class="line">      <span class="string">"initiator"</span>: <span class="string">""</span>,</span><br><span class="line">      <span class="string">"authRequire"</span>: null,</span><br><span class="line">      <span class="string">"initiatorSigns"</span>: null,</span><br><span class="line">      <span class="string">"authRequireSigns"</span>: null,</span><br><span class="line">      <span class="string">"receivedTimestamp"</span>: 0,</span><br><span class="line">      <span class="string">"modifyBlock"</span>: &#123;</span><br><span class="line">        <span class="string">"marked"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="string">"effectiveHeight"</span>: 0,</span><br><span class="line">        <span class="string">"effectiveTxid"</span>: <span class="string">""</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"txCount"</span>: 2,</span><br><span class="line">  <span class="string">"merkleTree"</span>: [</span><br><span class="line">    <span class="string">"416130c2a3b1f4ba67e1b32e7ad11b59f4884b2d0a8f6d1fbe851ed14c912e08"</span>,</span><br><span class="line">    <span class="string">"8af509d52ac61485ac064e2aa8c42bfd86a3f7b6a1ac6f966c280bad5c730998"</span>,</span><br><span class="line">    <span class="string">"7ab7a4688b09f759e58aa1990a991c767702fcb993159f62a925c4c3dbe63ec2"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"inTrunk"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="string">"nextHash"</span>: <span class="string">"8ef88b5c83870be994ed9a7abdcc029624e34e1adfe917011c1a98e1b06c0b9f"</span>,</span><br><span class="line">  <span class="string">"failedTxs"</span>: null,</span><br><span class="line">  <span class="string">"curTerm"</span>: 949236,</span><br><span class="line">  <span class="string">"curBlockNum"</span>: 4,</span><br><span class="line">  <span class="string">"justify"</span>: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><ul>
+<li><a href="./4505b11e.html">智能合约的使用</a></li>
+<li>启用TLS配置多节点网络</li>
+<li>使用POW共识部署网络</li>
+<li>使用XPOA共识部署网络</li>
+</ul>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/post/dd1671c6.html">超级链多节点部署</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">冯建建</a></p>
+        <p><span>发布时间:</span>2021-04-19, 09:13:45</p>
+        <p><span>最后更新:</span>2021-04-20, 14:24:48</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/post/dd1671c6.html" title="超级链多节点部署">https://mrfengjian.github.io/post/dd1671c6.html</a>
+            <span class="copy-path" data-clipboard-text="原文: https://mrfengjian.github.io/post/dd1671c6.html　　作者: 冯建建" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/post/4505b11e.html">
+                    在超级链上使用和开发智能合约
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/post/ea931d49.html">
+                    WSL命令行开发环境设置
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#超级链简介"><span class="toc-number">1.</span> <span class="toc-text">超级链简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#准备部署包"><span class="toc-number">2.</span> <span class="toc-text">准备部署包</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#从源码编译"><span class="toc-number">2.1.</span> <span class="toc-text">从源码编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#直接下载部署包"><span class="toc-number">2.2.</span> <span class="toc-text">直接下载部署包</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#部署多节点"><span class="toc-number">3.</span> <span class="toc-text">部署多节点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#启动第一个种子节点-bootNode"><span class="toc-number">3.1.</span> <span class="toc-text">启动第一个种子节点(bootNode)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动其他种子节点"><span class="toc-number">3.2.</span> <span class="toc-text">启动其他种子节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动其他节点"><span class="toc-number">3.3.</span> <span class="toc-text">启动其他节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检查节点状态"><span class="toc-number">3.4.</span> <span class="toc-text">检查节点状态</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#测试网络功能"><span class="toc-number">4.</span> <span class="toc-text">测试网络功能</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#内置转账"><span class="toc-number">4.1.</span> <span class="toc-text">内置转账</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TODO"><span class="toc-number">5.</span> <span class="toc-text">TODO</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"超级链多节点部署　| 冯建建的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/post/4505b11e.html" title="上一篇: 在超级链上使用和开发智能合约">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/post/ea931d49.html" title="下一篇: WSL命令行开发环境设置">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/4505b11e.html">在超级链上使用和开发智能合约</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd1671c6.html">超级链多节点部署</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ea931d49.html">WSL命令行开发环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/9c6b0310.html">Go语言Channel编程模式</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b6ae07.html">在electron中实现PDF预览功能</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a9cf0f63.html">electron打包踩坑</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3c644b30.html">vue与beego的集成</a></li><li class="post-list-item"><a class="post-list-link" href="/post/72883fba.html">fabric智能合约开发指南V2-contractapi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3f14187a.html">sparkoperator墙内使用指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b3065445.html">spark on kubernetes部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/93953441.html">kubernetes-dashboard部署demo</a></li><li class="post-list-item"><a class="post-list-link" href="/post/1903cc94.html">electron集成element-ui指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b28c3341.html">我的manjaro环境配置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/ba2b6a0e.html">操作系统和常用软件的镜像设置</a></li><li class="post-list-item"><a class="post-list-link" href="/post/979cd505.html">ansible入门（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/post/dd0d3a5a.html">在ubuntu上快速安装kubernetes</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b85e1da6.html">在ubuntu上快速安装docker</a></li><li class="post-list-item"><a class="post-list-link" href="/post/34be23be.html">go语言最佳实践——函数传参</a></li><li class="post-list-item"><a class="post-list-link" href="/post/a799a893.html">多阶段构建创建最小golang docker镜像</a></li><li class="post-list-item"><a class="post-list-link" href="/post/f22bd6d5.html">基于fabric-sdk-go的交易流程源码分析</a></li><li class="post-list-item"><a class="post-list-link" href="/post/3760b86f.html">账本数据结构介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/post/6cc685c6.html">智能合约开发指南</a></li><li class="post-list-item"><a class="post-list-link" href="/post/24f83bc7.html">一步一步搭建kafka共识的fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/15ebafa6.html">fabric-ca生成所有证书搭建fabric环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/c4b38323.html">一步一步搭建fabric网络环境</a></li><li class="post-list-item"><a class="post-list-link" href="/post/fb6add0e.html">docker overlay网络工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/59435c3a.html">docker内置dns server工作原理</a></li><li class="post-list-item"><a class="post-list-link" href="/post/b901096f.html">如何进入docker容器的网络命名空间</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2021 冯建建
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
